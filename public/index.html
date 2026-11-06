@@ -446,12 +446,15 @@
 
                 <!-- Step 1: Profile -->
                 <div id="step-1">
-                    <h2 class="text-xl font-bold text-slate-900 mb-6">Tell us about yourself</h2>
+                    <div class="mb-6">
+                        <h2 class="text-xl font-bold text-slate-900">Tell us about yourself</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Share your academic background and skills so our AI can accurately benchmark your career path, tier alignment, and placement roadmaps.</p>
+                    </div>
 
-                    <!-- 3-Column Basic Info: Full Name, Highest Education, Field of Study -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <!-- 1. Academic Credentials (3 Columns) -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                         <div>
-                            <label for="name" class="block text-xs font-semibold text-slate-700 mb-1.5">Full Name</label>
+                            <label for="name" class="block text-xs font-semibold text-slate-700 mb-1.5">Full Name *</label>
                             <input type="text" id="name"
                                 class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition placeholder:text-slate-400"
                                 placeholder="e.g., Alex Doe">
@@ -459,36 +462,140 @@
                         <div>
                             <label for="education" class="block text-xs font-semibold text-slate-700 mb-1.5">Highest Education</label>
                             <select id="education"
-                                class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-slate-700">
+                                class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-slate-800">
+                                <option value="Bachelor's Degree" selected>Bachelor's Degree (B.Tech / B.E / BCA / B.Sc)</option>
+                                <option value="Master's Degree">Master's Degree (M.Tech / MCA / M.Sc / MBA)</option>
+                                <option value="Diploma / Associate's">Diploma / Associate's Degree</option>
                                 <option value="High School">High School</option>
-                                <option value="Associate's Degree">Associate's Degree</option>
-                                <option value="Bachelor's Degree" selected>Bachelor's Degree</option>
-                                <option value="Master's Degree">Master's Degree</option>
-                                <option value="Doctorate">Doctorate</option>
+                                <option value="Doctorate">Doctorate / PhD</option>
                             </select>
                         </div>
                         <div>
-                            <label for="field-of-study" class="block text-xs font-semibold text-slate-700 mb-1.5">Field of Study</label>
+                            <label for="field-of-study" class="block text-xs font-semibold text-slate-700 mb-1.5">Field of Study / Branch</label>
                             <input type="text" id="field-of-study"
                                 class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition placeholder:text-slate-400"
-                                placeholder="e.g., Computer Science">
+                                placeholder="e.g., Computer Science, AI & ML, ECE">
                         </div>
                     </div>
 
-                    <!-- Skills & Tags -->
-                    <div class="mb-6">
-                        <label for="skills-input" class="block text-xs font-semibold text-slate-700 mb-1">Your Skills</label>
-                        <p class="text-xs text-slate-500 mb-2">Enter your skills one by one and press Enter. (e.g., Python, Teamwork, SQL)</p>
+                    <!-- 2. Contact & Online Profiles (4 Columns) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 mb-5">
+                        <div>
+                            <label for="email" class="block text-xs font-semibold text-slate-700 mb-1">Email</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs"><i class="fas fa-envelope"></i></span>
+                                <input type="email" id="email"
+                                    class="w-full pl-8 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition placeholder:text-slate-400"
+                                    placeholder="student@college.edu">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="phone" class="block text-xs font-semibold text-slate-700 mb-1">Phone Number</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs"><i class="fas fa-phone"></i></span>
+                                <input type="tel" id="phone"
+                                    class="w-full pl-8 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition placeholder:text-slate-400"
+                                    placeholder="+91 98765 43210">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="linkedin" class="block text-xs font-semibold text-slate-700 mb-1">LinkedIn Profile</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs"><i class="fab fa-linkedin text-blue-600"></i></span>
+                                <input type="text" id="linkedin"
+                                    class="w-full pl-8 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition placeholder:text-slate-400"
+                                    placeholder="linkedin.com/in/you">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="github-profile" class="block text-xs font-semibold text-slate-700 mb-1">GitHub / Portfolio URL</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs"><i class="fab fa-github text-slate-800"></i></span>
+                                <input type="text" id="github-profile"
+                                    class="w-full pl-8 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition placeholder:text-slate-400"
+                                    placeholder="github.com/you">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Academic Stage & Placement CGPA Benchmark (Side-by-Side) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                                <i class="fas fa-user-graduate text-indigo-600 text-xs"></i>
+                                <span>Academic Stage / Year of Study *</span>
+                            </label>
+                            <div class="grid grid-cols-3 gap-2" id="academic-stage-group">
+                                <div class="diagnostic-pill p-2.5 border border-slate-200 hover:border-slate-300 rounded-xl text-center" data-value="1st / 2nd Year">
+                                    <div class="text-xs font-bold text-slate-800">1st / 2nd Year</div>
+                                    <div class="text-[10px] text-slate-500 mt-0.5">Foundations & DSA</div>
+                                </div>
+                                <div class="diagnostic-pill active p-2.5 border border-slate-200 hover:border-slate-300 rounded-xl text-center" data-value="3rd Year">
+                                    <div class="text-xs font-bold text-slate-800">3rd Year</div>
+                                    <div class="text-[10px] text-indigo-600 font-semibold mt-0.5">Pre-Final / Intern</div>
+                                </div>
+                                <div class="diagnostic-pill p-2.5 border border-slate-200 hover:border-slate-300 rounded-xl text-center" data-value="Final Year / Recent Grad">
+                                    <div class="text-xs font-bold text-slate-800">Final Year</div>
+                                    <div class="text-[10px] text-slate-500 mt-0.5">Campus Placements</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                                <i class="fas fa-chart-line text-emerald-600 text-xs"></i>
+                                <span>Current / Target CGPA (Campus Cutoff)</span>
+                            </label>
+                            <div class="grid grid-cols-4 gap-1.5" id="cgpa-bracket-group">
+                                <div class="diagnostic-pill p-2 border border-slate-200 hover:border-slate-300 rounded-xl text-center" data-value="9.0+ CGPA">
+                                    <div class="text-xs font-bold text-slate-800">9.0+ CGPA</div>
+                                    <div class="text-[9px] text-emerald-600 font-semibold mt-0.5">Tier 1 Shortlist</div>
+                                </div>
+                                <div class="diagnostic-pill active p-2 border border-slate-200 hover:border-slate-300 rounded-xl text-center" data-value="8.0 - 8.9 CGPA">
+                                    <div class="text-xs font-bold text-slate-800">8.0–8.9</div>
+                                    <div class="text-[9px] text-blue-600 font-semibold mt-0.5">95%+ Drives</div>
+                                </div>
+                                <div class="diagnostic-pill p-2 border border-slate-200 hover:border-slate-300 rounded-xl text-center" data-value="7.0 - 7.9 CGPA">
+                                    <div class="text-xs font-bold text-slate-800">7.0–7.9</div>
+                                    <div class="text-[9px] text-slate-500 mt-0.5">Standard</div>
+                                </div>
+                                <div class="diagnostic-pill p-2 border border-slate-200 hover:border-slate-300 rounded-xl text-center" data-value="< 7.0 CGPA">
+                                    <div class="text-xs font-bold text-slate-800">&lt; 7.0 CGPA</div>
+                                    <div class="text-[9px] text-amber-600 font-semibold mt-0.5">Off-Campus</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Technical & Practical Skills -->
+                    <div class="mb-5">
+                        <div class="flex items-center justify-between mb-1">
+                            <label for="skills-input" class="block text-xs font-semibold text-slate-700">Your Technical Skills *</label>
+                            <span class="text-[11px] text-slate-400">Press Enter or comma to add</span>
+                        </div>
                         <input type="text" id="skills-input"
                             class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition placeholder:text-slate-400"
-                            placeholder="Add a skill...">
+                            placeholder="Add a skill (e.g. Python, SQL, React, DSA, Java, Docker)...">
+
+                        <!-- Clean Quick-Add Chips -->
+                        <div class="flex items-center gap-1.5 mt-2 flex-wrap text-xs text-slate-500">
+                            <span class="text-[11px] font-semibold text-slate-400">Quick add:</span>
+                            <button type="button" class="quick-skill-chip px-2.5 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] transition" data-skill="Python">+ Python</button>
+                            <button type="button" class="quick-skill-chip px-2.5 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] transition" data-skill="Java">+ Java</button>
+                            <button type="button" class="quick-skill-chip px-2.5 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] transition" data-skill="C++">+ C++</button>
+                            <button type="button" class="quick-skill-chip px-2.5 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] transition" data-skill="DSA">+ DSA</button>
+                            <button type="button" class="quick-skill-chip px-2.5 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] transition" data-skill="React">+ React</button>
+                            <button type="button" class="quick-skill-chip px-2.5 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] transition" data-skill="Node.js">+ Node.js</button>
+                            <button type="button" class="quick-skill-chip px-2.5 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] transition" data-skill="SQL">+ SQL</button>
+                            <button type="button" class="quick-skill-chip px-2.5 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] transition" data-skill="Git/GitHub">+ Git</button>
+                        </div>
 
                         <div id="skills-container"
                             class="mt-2.5 flex flex-wrap min-h-[42px] p-2 bg-slate-50 border border-slate-200 rounded-xl gap-1">
                         </div>
                     </div>
 
-                    <!-- AI Summary Generator (Full Width Indigo Button) -->
+                    <!-- 5. AI Professional Summary Generator (Full Width Indigo Button) -->
                     <div class="mb-5">
                         <button id="generate-summary-btn" type="button"
                             class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-xl transition shadow flex items-center justify-center gap-2 text-sm active:scale-[0.99]">
@@ -501,42 +608,23 @@
                         </div>
                     </div>
 
-                    <!-- Build Resume Checkbox -->
-                    <div class="mb-6 flex items-center">
-                        <input id="build-resume-checkbox" type="checkbox" checked
-                            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded">
-                        <label for="build-resume-checkbox" class="ml-2.5 block text-xs md:text-sm text-slate-700 select-none cursor-pointer">
-                            I want to build an ATS-friendly resume.
-                        </label>
-                    </div>
-
-                    <div id="step-1-error" class="text-red-500 text-xs mt-1 text-right h-4 font-semibold"></div>
-
-                    <!-- Next Button -->
-                    <div class="flex justify-end pt-2">
-                        <button id="next-from-step-1-btn" type="button"
-                            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-xl transition shadow flex items-center gap-2 text-sm">
-                            <span>Next</span>
-                            <i class="fas fa-arrow-right text-xs"></i>
-                        </button>
-                    </div>
-
-                    <!-- Hidden compatibility elements to support resume export, cloud sync, and diagnostic scoring seamlessly -->
-                    <div class="hidden" aria-hidden="true">
-                        <input type="hidden" id="email" value="">
-                        <input type="hidden" id="phone" value="">
-                        <input type="hidden" id="linkedin" value="">
-                        <input type="hidden" id="github-profile" value="">
-                        <div id="academic-stage-group">
-                            <div class="diagnostic-pill" data-value="1st / 2nd Year"></div>
-                            <div class="diagnostic-pill active" data-value="3rd Year"></div>
-                            <div class="diagnostic-pill" data-value="Final Year / Recent Grad"></div>
+                    <!-- 6. Footer Options & Navigation -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-slate-100">
+                        <div class="flex items-center">
+                            <input id="build-resume-checkbox" type="checkbox" checked
+                                class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded cursor-pointer">
+                            <label for="build-resume-checkbox" class="ml-2.5 block text-xs md:text-sm font-medium text-slate-700 select-none cursor-pointer">
+                                Include Experience & Projects to build an ATS-friendly resume
+                            </label>
                         </div>
-                        <div id="cgpa-bracket-group">
-                            <div class="diagnostic-pill" data-value="9.0+ CGPA"></div>
-                            <div class="diagnostic-pill active" data-value="8.0 - 8.9 CGPA"></div>
-                            <div class="diagnostic-pill" data-value="7.0 - 7.9 CGPA"></div>
-                            <div class="diagnostic-pill" data-value="< 7.0 CGPA"></div>
+
+                        <div>
+                            <div id="step-1-error" class="text-red-500 text-xs mb-1 text-right h-4 font-semibold"></div>
+                            <button id="next-from-step-1-btn" type="button"
+                                class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-xl transition shadow flex items-center justify-center gap-2 text-sm">
+                                <span>Next</span>
+                                <i class="fas fa-arrow-right text-xs"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
