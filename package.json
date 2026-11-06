@@ -1,0 +1,23 @@
+{
+  "name": "ai-career-advisor",
+  "version": "2.0.0",
+  "description": "Personalized AI Career Advisor powered by Google Gemini, Vercel Serverless Functions, and Firebase",
+  "main": "api/proxy.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "start": "npx serve ."
+  },
+  "keywords": [
+    "ai",
+    "career-advisor",
+    "gemini",
+    "vercel",
+    "firebase"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "vercel": "^39.0.0"
+  }
+}
+

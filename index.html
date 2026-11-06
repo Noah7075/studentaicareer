@@ -1,0 +1,2400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student AI Career Advisor - College Portal</title>
+
+    <!-- Tailwind CSS & Google Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Chart.js & jsPDF -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Firebase Compat SDKs (v10.8.0) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+
+    <!-- Firebase Configuration -->
+    <script src="firebase-config.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .step-active {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+        .skill-tag {
+            display: inline-flex;
+            align-items: center;
+            background-color: #e0e7ff;
+            color: #4338ca;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 13px;
+            font-weight: 500;
+            margin: 4px;
+        }
+        .skill-tag button {
+            margin-left: 8px;
+            color: #4338ca;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .fade-in {
+            animation: fadeIn 0.35s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        ::-webkit-scrollbar {
+            width: 7px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .dynamic-entry {
+            border-left: 3px solid #6366f1;
+        }
+
+        /* AI Mentor Chat Widget */
+        #chat-widget {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 360px;
+            max-width: 92vw;
+            height: 520px;
+            max-height: 82vh;
+            border-radius: 18px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: translateY(115%);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1000;
+            background-color: white;
+        }
+        #chat-widget.open {
+            transform: translateY(0);
+        }
+        .chat-message {
+            padding: 10px 14px;
+            border-radius: 18px;
+            margin-bottom: 8px;
+            max-width: 82%;
+            word-wrap: break-word;
+            font-size: 13.5px;
+            line-height: 1.45;
+        }
+        .user-message {
+            background-color: #3b82f6;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        .ai-message {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+        .typing-indicator span {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background-color: #9ca3af;
+            animation: pulse 1s infinite;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        #record-btn.recording {
+            background-color: #dc2626;
+            color: white;
+            box-shadow: 0 0 12px rgba(220, 38, 38, 0.6);
+        }
+        #record-btn.processing {
+            background-color: #f59e0b;
+            color: white;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+    <!-- Audio element for TTS playback -->
+    <audio id="tts-audio" style="display: none;"></audio>
+
+    <!-- Global Toast Notification -->
+    <div id="toast" class="fixed top-5 right-5 z-50 transform transition-all duration-300 translate-y-[-100px] opacity-0 pointer-events-none">
+        <div id="toast-inner" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl border text-sm font-medium"></div>
+    </div>
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+
+        <!-- Header Bar -->
+        <header class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 pb-5 border-b border-slate-200">
+            <div class="flex items-center space-x-3">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-bold text-xl shadow-md">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                        Student Career Portal
+                        <span class="text-[11px] bg-blue-100 text-blue-700 font-semibold px-2.5 py-0.5 rounded-full">AI Powered</span>
+                    </h1>
+                    <p class="text-xs text-slate-500">Personalized career roadmaps, voice interviews, and cloud resume storage</p>
+                </div>
+            </div>
+
+            <!-- Student Profile Badge & Controls (Visible only when logged in) -->
+            <div id="student-header-controls" class="hidden flex items-center gap-2.5">
+                <div class="flex items-center gap-2.5 bg-white border border-slate-200 px-3.5 py-1.5 rounded-xl shadow-sm">
+                    <div id="student-avatar" class="w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xs overflow-hidden">
+                        <span id="student-avatar-initials">S</span>
+                    </div>
+                    <div class="text-left">
+                        <div id="student-display-name" class="text-xs font-bold text-slate-800 leading-none">Student</div>
+                        <div class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1 mt-0.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Verified Session
+                        </div>
+                    </div>
+                </div>
+
+                <button id="header-sync-btn" title="Sync Profile to Cloud" class="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition border border-slate-200 bg-white">
+                    <i class="fas fa-cloud-upload-alt text-sm"></i>
+                </button>
+                <button id="header-resumes-btn" title="My Saved Resumes in Cloud" class="p-2 text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition border border-slate-200 bg-white">
+                    <i class="fas fa-folder-open text-sm"></i>
+                </button>
+                <button id="header-signout-btn" title="Sign Out of Portal" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition border border-rose-200 bg-white">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Sign Out</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- ========================================== -->
+        <!-- 🔒 MANDATORY STUDENT LOGIN GATE CARD      -->
+        <!-- Displayed whenever student is NOT signed in -->
+        <!-- ========================================== -->
+        <div id="login-gate-section" class="max-w-md mx-auto my-12 bg-white p-8 rounded-3xl shadow-xl border border-slate-200 fade-in">
+            <div class="text-center mb-6">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center mx-auto mb-4 text-2xl shadow-lg">
+                    <i class="fas fa-user-lock"></i>
+                </div>
+                <h2 class="text-2xl font-extrabold text-slate-900" id="auth-card-title">Student Portal Login</h2>
+                <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+                    Sign in with your student account to access your personal AI Career Advisor, generate tailored roadmaps, and save your resumes.
+                </p>
+            </div>
+
+            <!-- Firebase Setup Warning (if keys not inserted yet) -->
+            <div id="setup-warning-banner" class="hidden mb-5 p-3.5 bg-amber-50 border border-amber-200 text-amber-900 rounded-2xl text-xs">
+                <div class="font-bold flex items-center gap-1.5 text-amber-800 mb-1">
+                    <i class="fas fa-info-circle"></i> Firebase Configuration Pending
+                </div>
+                Please paste your Firebase keys in <code class="bg-amber-100 px-1 py-0.5 rounded font-mono font-semibold">firebase-config.js</code> to enable live logins.
+                <button id="demo-mode-btn" class="mt-2.5 w-full bg-amber-200 hover:bg-amber-300 text-amber-950 font-bold py-1.5 px-3 rounded-xl transition text-[11px]">
+                    Continue in Demo Student Mode &rarr;
+                </button>
+            </div>
+
+            <!-- Google Sign-In Button -->
+            <button id="auth-google-btn" class="w-full flex items-center justify-center gap-3 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold py-3 px-4 rounded-xl transition shadow-sm mb-4 text-sm">
+                <svg class="w-5 h-5" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                </svg>
+                <span>Continue with Google</span>
+            </button>
+
+            <div class="relative flex py-2 items-center mb-4">
+                <div class="flex-grow border-t border-slate-200"></div>
+                <span class="flex-shrink mx-3 text-slate-400 text-xs uppercase tracking-wider font-semibold">Or with Student Email</span>
+                <div class="flex-grow border-t border-slate-200"></div>
+            </div>
+
+            <!-- Auth Error Message -->
+            <div id="auth-error-alert" class="hidden mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl"></div>
+
+            <form id="email-auth-form" class="space-y-3.5">
+                <div id="auth-name-field" class="hidden">
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Your Full Name</label>
+                    <input type="text" id="auth-name-input" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="e.g. Alex Johnson">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">College / Personal Email</label>
+                    <input type="email" id="auth-email-input" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="student@college.edu">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Password</label>
+                    <input type="password" id="auth-password-input" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="••••••••">
+                </div>
+                <button type="submit" id="auth-submit-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition shadow-md text-sm">
+                    <span id="auth-submit-text">Sign In</span>
+                    <span id="auth-submit-spinner" class="hidden"><i class="fas fa-spinner fa-spin mr-2"></i>Authenticating...</span>
+                </button>
+            </form>
+
+            <div class="text-center mt-5 pt-4 border-t border-slate-100 text-xs text-slate-500">
+                <span id="auth-toggle-prompt">First time here?</span>
+                <button id="auth-toggle-btn" class="text-blue-600 font-bold hover:underline ml-1">Create Student Account</button>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- 🔓 MAIN CAREER ADVISOR APP                -->
+        <!-- Unlocks ONLY after successful login       -->
+        <!-- ========================================== -->
+        <div id="main-portal-content" class="hidden">
+
+            <!-- Saved Profile Restore Prompt -->
+            <div id="profile-restore-banner" class="hidden mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-2xl text-indigo-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm fade-in">
+                <div class="flex items-center gap-2.5">
+                    <i class="fas fa-cloud-check text-indigo-600 text-lg"></i>
+                    <span>Found your saved career assessment in the cloud! Would you like to restore it?</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="confirm-restore-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold transition shadow-sm">Restore Assessment</button>
+                    <button id="dismiss-restore-btn" class="text-slate-500 hover:text-slate-700 text-xs font-medium px-2">Start Fresh</button>
+                </div>
+            </div>
+
+            <!-- Main Advisor Card -->
+            <main class="bg-white p-6 md:p-8 rounded-3xl shadow-lg border border-slate-200">
+                <!-- Step Indicators -->
+                <div class="flex items-center justify-center space-x-2 md:space-x-4 mb-8">
+                    <div id="step-1-indicator" class="step-active flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-sm">1</div>
+                        <span class="hidden md:inline font-medium">Profile</span>
+                    </div>
+                    <div class="flex-1 h-px bg-slate-200"></div>
+                    <div id="step-2-indicator" class="flex items-center space-x-2 text-slate-400">
+                        <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-sm">2</div>
+                        <span class="hidden md:inline font-medium">Resume</span>
+                    </div>
+                    <div class="flex-1 h-px bg-slate-200"></div>
+                    <div id="step-3-indicator" class="flex items-center space-x-2 text-slate-400">
+                        <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-sm">3</div>
+                        <span class="hidden md:inline font-medium">Goals</span>
+                    </div>
+                    <div class="flex-1 h-px bg-slate-200"></div>
+                    <div id="step-4-indicator" class="flex items-center space-x-2 text-slate-400">
+                        <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-sm">4</div>
+                        <span class="hidden md:inline font-medium">Advice</span>
+                    </div>
+                </div>
+
+                <!-- Step 1: Profile & Skills -->
+                <div id="step-1">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-bold text-slate-900">Student Profile & Skills</h2>
+                        <span class="text-xs text-slate-500">Step 1 of 3</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label for="name" class="block text-sm font-semibold text-slate-700 mb-1">Full Name</label>
+                            <input type="text" id="name" class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="e.g., Alex Johnson">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-semibold text-slate-700 mb-1">Email</label>
+                            <input type="email" id="email" class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="e.g., student@college.edu">
+                        </div>
+                        <div>
+                            <label for="phone" class="block text-sm font-semibold text-slate-700 mb-1">Phone</label>
+                            <input type="tel" id="phone" class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="e.g., +91 98765 43210">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        <div>
+                            <label for="linkedin" class="block text-sm font-semibold text-slate-700 mb-1">LinkedIn Profile</label>
+                            <input type="text" id="linkedin" class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="e.g., linkedin.com/in/alexjohnson">
+                        </div>
+                        <div>
+                            <label for="education" class="block text-sm font-semibold text-slate-700 mb-1">Degree / Education Level</label>
+                            <select id="education" class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white">
+                                <option>High School</option>
+                                <option>Diploma / Associate's</option>
+                                <option selected>Bachelor's Degree (B.Tech / B.E / B.Sc / BCA / B.Com)</option>
+                                <option>Master's Degree (M.Tech / M.Sc / MCA / MBA)</option>
+                                <option>Doctorate (Ph.D.)</option>
+                                <option>Other / Self-Taught</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <label for="field-of-study" class="block text-sm font-semibold text-slate-700 mb-1">Field of Study / Branch</label>
+                        <input type="text" id="field-of-study" class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="e.g., Computer Science, Electrical Engineering, Data Science">
+                    </div>
+
+                    <div class="mt-6">
+                        <label for="skills-input" class="block text-sm font-semibold text-slate-700 mb-1">Skills (type and press Enter or comma)</label>
+                        <input type="text" id="skills-input" class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="e.g., Python, SQL, React, Communication, Problem Solving">
+                        <div id="skills-container" class="mt-3 flex flex-wrap min-h-[38px] p-2 bg-slate-50 border border-slate-200 rounded-xl"></div>
+                    </div>
+
+                    <!-- AI Summary Generator -->
+                    <div class="mt-6 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm">Need a Professional Resume Summary?</h4>
+                                <p class="text-xs text-slate-500">Let Gemini generate a tailored bio based on your academic profile & skills.</p>
+                            </div>
+                            <button id="generate-summary-btn" class="bg-indigo-100 text-indigo-700 hover:bg-indigo-200 font-semibold px-4 py-2 rounded-xl text-xs transition flex items-center justify-center flex-shrink-0">
+                                <span id="summary-btn-text"><i class="fas fa-magic mr-1.5"></i>Generate Summary with AI</span>
+                                <span id="summary-spinner" class="hidden"><i class="fas fa-spinner fa-spin mr-1.5"></i>Writing...</span>
+                            </button>
+                        </div>
+                        <div id="ai-summary-container" class="hidden mt-3 p-3.5 bg-white border border-indigo-100 rounded-xl text-sm text-slate-700 leading-relaxed">
+                            <p id="ai-summary-text"></p>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex items-center">
+                        <input id="build-resume-checkbox" type="checkbox" checked class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded">
+                        <label for="build-resume-checkbox" class="ml-2 block text-sm font-medium text-slate-700">Include Experience & Projects to export a tailored resume</label>
+                    </div>
+
+                    <div id="step-1-error" class="text-red-500 text-sm mt-2 text-right h-5"></div>
+
+                    <div class="mt-8 flex justify-end">
+                        <button id="next-from-step-1-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-xl transition shadow-sm flex items-center gap-2">
+                            <span>Continue</span>
+                            <i class="fas fa-arrow-right text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Experience & Projects -->
+                <div id="step-2" class="hidden">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-bold text-slate-900">Internships, Experience & Projects</h2>
+                        <span class="text-xs text-slate-500">Step 2 of 3</span>
+                    </div>
+
+                    <!-- Experience Section -->
+                    <div class="mb-8">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-lg font-semibold text-slate-800">Internships & Work Experience</h3>
+                            <button id="add-experience-btn" class="text-sm font-semibold text-blue-600 hover:text-blue-800 transition flex items-center">
+                                <i class="fas fa-plus mr-1"></i> Add Experience
+                            </button>
+                        </div>
+                        <div id="experience-entries" class="space-y-4"></div>
+                    </div>
+
+                    <!-- Projects Section -->
+                    <div class="mb-8">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-lg font-semibold text-slate-800">Academic & Personal Projects</h3>
+                            <button id="add-project-btn" class="text-sm font-semibold text-blue-600 hover:text-blue-800 transition flex items-center">
+                                <i class="fas fa-plus mr-1"></i> Add Project
+                            </button>
+                        </div>
+                        <div id="project-entries" class="space-y-4"></div>
+                    </div>
+
+                    <div class="mt-8 flex justify-between">
+                        <button id="prev-to-step-1-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-6 py-2.5 rounded-xl transition">
+                            <i class="fas fa-arrow-left text-xs mr-2"></i>Back
+                        </button>
+                        <button id="next-to-step-3-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-xl transition shadow-sm">
+                            Continue to Goals<i class="fas fa-arrow-right text-xs ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Interests & Aspirations -->
+                <div id="step-3" class="hidden">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-bold text-slate-900">Career Goals & Preferences</h2>
+                        <span class="text-xs text-slate-500">Step 3 of 3</span>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label for="interests" class="block text-sm font-semibold text-slate-700">What roles or domains inspire you? What problems do you want to solve?</label>
+                            <button id="improve-interest-btn" class="text-xs bg-indigo-100 text-indigo-700 font-semibold px-2.5 py-1 rounded-lg hover:bg-indigo-200 transition flex items-center">
+                                <span id="improve-btn-text"><i class="fas fa-wand-magic-sparkles mr-1"></i>Enhance with AI</span>
+                                <span id="improving-spinner" class="hidden"><i class="fas fa-spinner fa-spin mr-1"></i>Refining...</span>
+                            </button>
+                        </div>
+                        <textarea id="interests" rows="5" class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="e.g., I am passionate about software engineering, especially cloud architectures and AI applications. I want to build robust products that scale to millions of users..."></textarea>
+                    </div>
+
+                    <div id="step-3-error" class="text-red-500 text-sm mt-2 text-right h-5"></div>
+
+                    <div class="mt-8 flex justify-between">
+                        <button id="prev-from-step-3-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-6 py-2.5 rounded-xl transition">
+                            <i class="fas fa-arrow-left text-xs mr-2"></i>Back
+                        </button>
+                        <button id="get-advice-btn" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold px-8 py-3 rounded-xl transition shadow-md flex items-center">
+                            <span id="btn-text"><i class="fas fa-sparkles mr-2"></i>Generate AI Career Plan</span>
+                            <span id="loading-spinner" class="hidden"><i class="fas fa-spinner fa-spin mr-2"></i>Analyzing with Gemini...</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Results & Recommendations -->
+                <div id="results-section" class="hidden">
+                    <div id="results-content"></div>
+
+                    <!-- Simulated Job Opportunities -->
+                    <div id="job-opportunities-container" class="hidden mt-8 border-t border-slate-200 pt-6"></div>
+
+                    <!-- AI Networking Assistant -->
+                    <div id="networking-assistant-container" class="hidden mt-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Build Your Professional Network</h3>
+                        <p class="text-slate-600 text-sm mb-4">Networking accelerates hiring. Let Gemini identify the exact alumni and engineers to reach out to on LinkedIn.</p>
+                        <button id="generate-networking-btn" class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold px-5 py-2 rounded-xl transition shadow-sm text-sm">
+                            <span class="btn-text"><i class="fas fa-users mr-2"></i>Generate Networking Strategy</span>
+                            <span class="spinner hidden"><i class="fas fa-spinner fa-spin mr-2"></i>Generating...</span>
+                        </button>
+                        <div id="networking-plan-content" class="hidden mt-4"></div>
+                    </div>
+
+                    <!-- Interview Prep Container -->
+                    <div id="interview-prep-container" class="hidden mt-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 fade-in"></div>
+
+                    <!-- Results Action Bar -->
+                    <div class="mt-8 pt-6 border-t border-slate-200 flex flex-wrap items-center justify-center gap-3">
+                        <button id="mentor-chat-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-5 py-2.5 rounded-xl transition shadow-sm text-sm flex items-center">
+                            <i class="fas fa-comments mr-2"></i>Chat with AI Mentor
+                        </button>
+                        <button id="interview-prep-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl transition shadow-sm text-sm flex items-center">
+                            <i class="fas fa-user-tie mr-2"></i>Live Voice Interview
+                        </button>
+                        <button id="download-resume-btn" class="bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-2.5 rounded-xl transition shadow-sm text-sm hidden flex items-center">
+                            <i class="fas fa-download mr-2"></i>Download Resume (PDF)
+                        </button>
+                        <button id="cloud-save-resume-btn" class="bg-emerald-700 hover:bg-emerald-800 text-white font-semibold px-5 py-2.5 rounded-xl transition shadow-sm text-sm hidden flex items-center">
+                            <i class="fas fa-cloud-upload-alt mr-2"></i>Save Resume to Cloud
+                        </button>
+                        <button id="cloud-save-profile-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-xl transition shadow-sm text-sm flex items-center">
+                            <i class="fas fa-save mr-2"></i>Sync Profile to Cloud
+                        </button>
+                        <button id="start-over-btn" class="bg-slate-600 hover:bg-slate-700 text-white font-semibold px-5 py-2.5 rounded-xl transition shadow-sm text-sm flex items-center">
+                            <i class="fas fa-redo-alt mr-2"></i>Start Over
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- AI Mentor Chat Widget -->
+    <div id="chat-widget" class="bg-white border border-slate-300">
+        <div class="p-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white flex justify-between items-center">
+            <h3 class="font-bold flex items-center gap-2 text-sm"><i class="fas fa-brain"></i>AI Career Mentor</h3>
+            <button id="close-chat-btn" class="text-white/80 hover:text-white transition"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="chat-messages" class="flex-1 p-4 overflow-y-auto flex flex-col space-y-2 bg-slate-50">
+            <div id="chat-typing-indicator" class="ai-message hidden">
+                <div class="typing-indicator"><span></span><span></span><span></span></div>
+            </div>
+        </div>
+        <div class="p-3 border-t border-slate-200 bg-white">
+            <div class="flex items-center gap-2">
+                <input type="text" id="chat-input" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Ask a follow-up question...">
+                <button id="chat-send-btn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-sm transition"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Saved Resumes Modal -->
+    <div id="resumes-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-slate-200 relative animate-fadeIn">
+            <button id="close-resumes-modal-btn" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                    <i class="fas fa-folder-open"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">Your Cloud Resumes</h3>
+                    <p class="text-xs text-slate-500">Stored privately in Firebase Cloud Storage</p>
+                </div>
+            </div>
+            <div id="resumes-list-container" class="space-y-2 max-h-60 overflow-y-auto">
+                <p class="text-sm text-slate-500 italic py-4 text-center">Loading resumes...</p>
+            </div>
+        </div>
+    </div>
+
+<script>
+    (function() {
+        "use strict";
+
+        // Proxy endpoint (works on Cloudflare Pages via functions/api/proxy.js)
+        const PROXY_URL = "/api/proxy";
+
+        // --- DOM Elements ---
+        const loginGateSection = document.getElementById('login-gate-section');
+        const mainPortalContent = document.getElementById('main-portal-content');
+        const studentHeaderControls = document.getElementById('student-header-controls');
+        const studentDisplayName = document.getElementById('student-display-name');
+        const studentAvatarInitials = document.getElementById('student-avatar-initials');
+        const setupWarningBanner = document.getElementById('setup-warning-banner');
+        const demoModeBtn = document.getElementById('demo-mode-btn');
+
+        // Auth Form Elements
+        const authCardTitle = document.getElementById('auth-card-title');
+        const authGoogleBtn = document.getElementById('auth-google-btn');
+        const emailAuthForm = document.getElementById('email-auth-form');
+        const authNameField = document.getElementById('auth-name-field');
+        const authNameInput = document.getElementById('auth-name-input');
+        const authEmailInput = document.getElementById('auth-email-input');
+        const authPasswordInput = document.getElementById('auth-password-input');
+        const authSubmitBtn = document.getElementById('auth-submit-btn');
+        const authSubmitText = document.getElementById('auth-submit-text');
+        const authSubmitSpinner = document.getElementById('auth-submit-spinner');
+        const authTogglePrompt = document.getElementById('auth-toggle-prompt');
+        const authToggleBtn = document.getElementById('auth-toggle-btn');
+        const authErrorAlert = document.getElementById('auth-error-alert');
+        const headerSignoutBtn = document.getElementById('header-signout-btn');
+        const headerSyncBtn = document.getElementById('header-sync-btn');
+        const headerResumesBtn = document.getElementById('header-resumes-btn');
+
+        // Wizard & Assessment Elements
+        const steps = [
+            document.getElementById('step-1'),
+            document.getElementById('step-2'),
+            document.getElementById('step-3'),
+            document.getElementById('results-section')
+        ];
+        const stepIndicators = [
+            document.getElementById('step-1-indicator'),
+            document.getElementById('step-2-indicator'),
+            document.getElementById('step-3-indicator'),
+            document.getElementById('step-4-indicator')
+        ];
+
+        const nextFromStep1Btn = document.getElementById('next-from-step-1-btn');
+        const skillsInput = document.getElementById('skills-input');
+        const skillsContainer = document.getElementById('skills-container');
+        const buildResumeCheckbox = document.getElementById('build-resume-checkbox');
+        const generateSummaryBtn = document.getElementById('generate-summary-btn');
+        const summaryBtnText = document.getElementById('summary-btn-text');
+        const summarySpinner = document.getElementById('summary-spinner');
+        const aiSummaryContainer = document.getElementById('ai-summary-container');
+        const aiSummaryText = document.getElementById('ai-summary-text');
+
+        const prevToStep1Btn = document.getElementById('prev-to-step-1-btn');
+        const nextToStep3Btn = document.getElementById('next-to-step-3-btn');
+        const addExperienceBtn = document.getElementById('add-experience-btn');
+        const addProjectBtn = document.getElementById('add-project-btn');
+        const experienceEntries = document.getElementById('experience-entries');
+        const projectEntries = document.getElementById('project-entries');
+
+        const prevFromStep3Btn = document.getElementById('prev-from-step-3-btn');
+        const getAdviceBtn = document.getElementById('get-advice-btn');
+        const interestsTextarea = document.getElementById('interests');
+        const improveInterestBtn = document.getElementById('improve-interest-btn');
+        const improveBtnText = document.getElementById('improve-btn-text');
+        const improvingSpinner = document.getElementById('improving-spinner');
+        const btnText = document.getElementById('btn-text');
+        const loadingSpinner = document.getElementById('loading-spinner');
+
+        const resultsContent = document.getElementById('results-content');
+        const startOverBtn = document.getElementById('start-over-btn');
+        const downloadResumeBtn = document.getElementById('download-resume-btn');
+        const cloudSaveResumeBtn = document.getElementById('cloud-save-resume-btn');
+        const cloudSaveProfileBtn = document.getElementById('cloud-save-profile-btn');
+        const interviewPrepBtn = document.getElementById('interview-prep-btn');
+        const mentorChatBtn = document.getElementById('mentor-chat-btn');
+        const generateNetworkingBtn = document.getElementById('generate-networking-btn');
+
+        const chatWidget = document.getElementById('chat-widget');
+        const closeChatBtn = document.getElementById('close-chat-btn');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const chatSendBtn = document.getElementById('chat-send-btn');
+        const chatTypingIndicator = document.getElementById('chat-typing-indicator');
+
+        const jobOpportunitiesContainer = document.getElementById('job-opportunities-container');
+        const networkingAssistantContainer = document.getElementById('networking-assistant-container');
+        const networkingPlanContent = document.getElementById('networking-plan-content');
+
+        const resumesModal = document.getElementById('resumes-modal');
+        const closeResumesModalBtn = document.getElementById('close-resumes-modal-btn');
+        const resumesListContainer = document.getElementById('resumes-list-container');
+        const profileRestoreBanner = document.getElementById('profile-restore-banner');
+        const confirmRestoreBtn = document.getElementById('confirm-restore-btn');
+        const dismissRestoreBtn = document.getElementById('dismiss-restore-btn');
+
+        const ttsAudio = document.getElementById('tts-audio');
+        let recognition = null;
+        let isRecording = false;
+        let answerTranscript = '';
+
+        // --- State Variables ---
+        let isSignUpMode = false;
+        let cachedCloudProfile = null;
+        let currentStudent = null;
+        let userSkills = [];
+        let experienceCount = 0;
+        let projectCount = 0;
+        let careerRecommendations = [];
+        let chatHistory = [];
+        let interviewState = {
+            questions: [],
+            currentQuestionIndex: 0,
+            isInterviewActive: false
+        };
+
+        const learningResources = {
+            "html": { title: "HTML Full Course", url: "https://www.freecodecamp.org/news/html-full-course/" },
+            "css": { title: "CSS Tutorial", url: "https://www.w3schools.com/css/" },
+            "javascript": { title: "JavaScript Tutorial", url: "https://www.javascript.info/" },
+            "python": { title: "Python for Everybody", url: "https://www.py4e.com/book" },
+            "java": { title: "Java Programming", url: "https://java-programming.mooc.fi/" },
+            "c++": { title: "C++ Tutorial", url: "https://www.learncpp.com/" },
+            "react": { title: "Official React Tutorial", url: "https://react.dev/learn" },
+            "angular": { title: "Angular Tour of Heroes", url: "https://angular.io/tutorial" },
+            "vue.js": { title: "Vue.js Guide", url: "https://vuejs.org/guide/introduction.html" },
+            "node.js": { title: "Node.js Documentation", url: "https://nodejs.org/en/docs" },
+            "django": { title: "Django Tutorial", url: "https://docs.djangoproject.com/en/5.0/intro/tutorial01/" },
+            "flask": { title: "Flask Documentation", url: "https://flask.palletsprojects.com/en/3.0.x/" },
+            "sql": { title: "SQLBolt", url: "https://sqlbolt.com/" },
+            "mongodb": { title: "MongoDB University", url: "https://learn.mongodb.com/" },
+            "aws": { title: "AWS Free Tier", url: "https://aws.amazon.com/free/" },
+            "azure": { title: "Azure Fundamentals", url: "https://learn.microsoft.com/en-us/training/paths/microsoft-azure-fundamentals-describe-cloud-concepts/" },
+            "gcp": { title: "Google Cloud Skills Boost", url: "https://www.cloudskillsboost.google/" },
+            "docker": { title: "Docker Get Started", url: "https://docs.docker.com/get-started/" },
+            "kubernetes": { title: "Kubernetes Basics", url: "https://kubernetes.io/docs/tutorials/kubernetes-basics/" },
+            "git": { title: "Git Handbook", url: "https://guides.github.com/introduction/git-handbook/" },
+            "figma": { title: "Figma for Beginners", url: "https://www.youtube.com/watch?v=Cx2dkpBxst8" },
+            "adobe xd": { title: "Adobe XD Tutorial", url: "https://www.adobe.com/products/xd/learn.html" },
+            "sketch": { title: "Sketch Tutorials", url: "https://www.sketch.com/learn/" },
+            "prototyping": { title: "Prototyping and Design", url: "https://www.interaction-design.org/courses/ui-design-patterns-for-successful-software" }
+        };
+
+        // --- Toast Notification ---
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const inner = document.getElementById('toast-inner');
+            
+            let bgClass = 'bg-slate-900 text-white border-slate-700';
+            let icon = 'fas fa-info-circle text-blue-400';
+
+            if (type === 'success') {
+                bgClass = 'bg-emerald-900 text-emerald-100 border-emerald-700';
+                icon = 'fas fa-check-circle text-emerald-400';
+            } else if (type === 'error') {
+                bgClass = 'bg-rose-900 text-rose-100 border-rose-700';
+                icon = 'fas fa-exclamation-circle text-rose-400';
+            }
+
+            inner.className = `flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl border text-sm font-medium ${bgClass}`;
+            inner.innerHTML = `<i class="${icon}"></i><span>${message}</span>`;
+
+            toast.classList.remove('translate-y-[-100px]', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-[-100px]', 'opacity-0');
+            }, 3500);
+        }
+
+        // ==========================================
+        // 🔒 MANDATORY AUTHENTICATION MANAGEMENT
+        // ==========================================
+        function initAuth() {
+            // Check if Firebase is configured
+            const isConfigured = window.FirebaseService && window.FirebaseService.isConfigured();
+            if (!isConfigured) {
+                setupWarningBanner.classList.remove('hidden');
+            }
+
+            demoModeBtn.addEventListener('click', () => {
+                unlockPortalForStudent({
+                    displayName: "Demo Student",
+                    email: "student@college.edu",
+                    uid: "demo-student-123"
+                });
+                showToast("Unlocked in Demo Student Mode", "info");
+            });
+
+            authToggleBtn.addEventListener('click', toggleAuthMode);
+            authGoogleBtn.addEventListener('click', handleGoogleSignIn);
+            emailAuthForm.addEventListener('submit', handleEmailAuth);
+            headerSignoutBtn.addEventListener('click', handleSignOut);
+            headerSyncBtn.addEventListener('click', handleManualProfileSave);
+            headerResumesBtn.addEventListener('click', openResumesModal);
+            closeResumesModalBtn.addEventListener('click', () => resumesModal.classList.add('hidden'));
+
+            confirmRestoreBtn.addEventListener('click', () => {
+                if (cachedCloudProfile) {
+                    applyUserProfileData(cachedCloudProfile);
+                    showToast("Previous assessment restored!", "success");
+                }
+                profileRestoreBanner.classList.add('hidden');
+            });
+
+            dismissRestoreBtn.addEventListener('click', () => {
+                profileRestoreBanner.classList.add('hidden');
+            });
+
+            // Firebase Auth State Listener
+            if (window.FirebaseService) {
+                window.FirebaseService.onAuthStateChanged(user => {
+                    if (user) {
+                        unlockPortalForStudent(user);
+                    } else if (!currentStudent || currentStudent.uid !== "demo-student-123") {
+                        lockPortal();
+                    }
+                });
+            }
+        }
+
+        function unlockPortalForStudent(user) {
+            currentStudent = user;
+            const name = user.displayName || user.email?.split('@')[0] || "Student";
+
+            studentDisplayName.textContent = name;
+            studentAvatarInitials.textContent = name.charAt(0).toUpperCase();
+
+            // Populate initial input fields with student identity
+            const nameField = document.getElementById('name');
+            const emailField = document.getElementById('email');
+            if (nameField && !nameField.value && user.displayName) nameField.value = user.displayName;
+            if (emailField && !emailField.value && user.email) emailField.value = user.email;
+
+            // Transition UI from Login Gate to Main Portal
+            loginGateSection.classList.add('hidden');
+            mainPortalContent.classList.remove('hidden');
+            studentHeaderControls.classList.remove('hidden');
+
+            // Check if student has previous cloud profile
+            if (window.FirebaseService && window.FirebaseService.isConfigured()) {
+                window.FirebaseService.loadUserProfile().then(profile => {
+                    if (profile && (profile.skills?.length > 0 || profile.careerRecommendations?.length > 0)) {
+                        cachedCloudProfile = profile;
+                        profileRestoreBanner.classList.remove('hidden');
+                    }
+                }).catch(err => console.warn("Cloud profile fetch:", err));
+            }
+        }
+
+        function lockPortal() {
+            currentStudent = null;
+            loginGateSection.classList.remove('hidden');
+            mainPortalContent.classList.add('hidden');
+            studentHeaderControls.classList.add('hidden');
+            profileRestoreBanner.classList.add('hidden');
+        }
+
+        function toggleAuthMode() {
+            isSignUpMode = !isSignUpMode;
+            authErrorAlert.classList.add('hidden');
+            if (isSignUpMode) {
+                authCardTitle.textContent = "Register Student Account";
+                authSubmitText.textContent = "Create Account";
+                authTogglePrompt.textContent = "Already have an account?";
+                authToggleBtn.textContent = "Sign In here";
+                authNameField.classList.remove('hidden');
+            } else {
+                authCardTitle.textContent = "Student Portal Login";
+                authSubmitText.textContent = "Sign In";
+                authTogglePrompt.textContent = "First time here?";
+                authToggleBtn.textContent = "Create Student Account";
+                authNameField.classList.add('hidden');
+            }
+        }
+
+        async function handleGoogleSignIn() {
+            if (!window.FirebaseService || !window.FirebaseService.isConfigured()) {
+                alert("Please configure your Firebase keys in firebase-config.js first.");
+                return;
+            }
+            try {
+                authGoogleBtn.disabled = true;
+                await window.FirebaseService.signInWithGoogle();
+                showToast("Signed in with Google!", "success");
+            } catch (err) {
+                console.error("Google login failed:", err);
+                authErrorAlert.textContent = err.message || "Google sign in failed.";
+                authErrorAlert.classList.remove('hidden');
+            } finally {
+                authGoogleBtn.disabled = false;
+            }
+        }
+
+        async function handleEmailAuth(e) {
+            e.preventDefault();
+            if (!window.FirebaseService || !window.FirebaseService.isConfigured()) {
+                alert("Please configure your Firebase keys in firebase-config.js first.");
+                return;
+            }
+
+            const email = authEmailInput.value.trim();
+            const password = authPasswordInput.value;
+            const displayName = authNameInput.value.trim();
+
+            authSubmitText.classList.add('hidden');
+            authSubmitSpinner.classList.remove('hidden');
+            authSubmitBtn.disabled = true;
+            authErrorAlert.classList.add('hidden');
+
+            try {
+                if (isSignUpMode) {
+                    await window.FirebaseService.signUpWithEmail(email, password, displayName);
+                    showToast("Account created successfully!", "success");
+                } else {
+                    await window.FirebaseService.signInWithEmail(email, password);
+                    showToast("Welcome back!", "success");
+                }
+            } catch (err) {
+                console.error("Auth error:", err);
+                authErrorAlert.textContent = err.message || "Authentication failed.";
+                authErrorAlert.classList.remove('hidden');
+            } finally {
+                authSubmitText.classList.remove('hidden');
+                authSubmitSpinner.classList.add('hidden');
+                authSubmitBtn.disabled = false;
+            }
+        }
+
+        async function handleSignOut() {
+            try {
+                if (window.FirebaseService && window.FirebaseService.isConfigured()) {
+                    await window.FirebaseService.signOut();
+                }
+                lockPortal();
+                showToast("Signed out safely", "info");
+            } catch (err) {
+                console.error("Sign out error:", err);
+            }
+        }
+
+        // ==========================================
+        // 💾 PROFILE & RESUME CLOUD SYNCHRONIZATION
+        // ==========================================
+        function collectUserProfileData() {
+            const experiences = [];
+            for (let i = 1; i <= experienceCount; i++) {
+                const titleEl = document.getElementById(`exp-title-${i}`);
+                if (titleEl) {
+                    experiences.push({
+                        title: titleEl.value,
+                        company: document.getElementById(`exp-company-${i}`)?.value || '',
+                        start: document.getElementById(`exp-start-${i}`)?.value || '',
+                        end: document.getElementById(`exp-end-${i}`)?.value || '',
+                        desc: document.getElementById(`exp-desc-${i}`)?.value || ''
+                    });
+                }
+            }
+
+            const projects = [];
+            for (let i = 1; i <= projectCount; i++) {
+                const nameEl = document.getElementById(`proj-name-${i}`);
+                if (nameEl) {
+                    projects.push({
+                        name: nameEl.value,
+                        desc: document.getElementById(`proj-desc-${i}`)?.value || '',
+                        tech: document.getElementById(`proj-tech-${i}`)?.value || ''
+                    });
+                }
+            }
+
+            return {
+                userName: document.getElementById('name')?.value || '',
+                email: document.getElementById('email')?.value || '',
+                phone: document.getElementById('phone')?.value || '',
+                linkedin: document.getElementById('linkedin')?.value || '',
+                education: document.getElementById('education')?.value || '',
+                fieldOfStudy: document.getElementById('field-of-study')?.value || '',
+                skills: [...userSkills],
+                buildResume: buildResumeCheckbox?.checked || false,
+                aiSummary: aiSummaryText?.textContent || '',
+                interests: interestsTextarea?.value || '',
+                careerRecommendations: careerRecommendations || []
+            };
+        }
+
+        function applyUserProfileData(data) {
+            if (!data) return;
+            if (data.userName) document.getElementById('name').value = data.userName;
+            if (data.email) document.getElementById('email').value = data.email;
+            if (data.phone) document.getElementById('phone').value = data.phone;
+            if (data.linkedin) document.getElementById('linkedin').value = data.linkedin;
+            if (data.education) document.getElementById('education').value = data.education;
+            if (data.fieldOfStudy) document.getElementById('field-of-study').value = data.fieldOfStudy;
+
+            if (Array.isArray(data.skills)) {
+                userSkills = [...data.skills];
+                renderSkills();
+            }
+
+            if (typeof data.buildResume === 'boolean') {
+                buildResumeCheckbox.checked = data.buildResume;
+            }
+
+            if (data.aiSummary) {
+                aiSummaryText.textContent = data.aiSummary;
+                aiSummaryContainer.classList.remove('hidden');
+            }
+
+            if (data.interests) {
+                interestsTextarea.value = data.interests;
+            }
+
+            if (Array.isArray(data.experiences) && data.experiences.length > 0) {
+                experienceEntries.innerHTML = '';
+                experienceCount = 0;
+                data.experiences.forEach(exp => {
+                    addExperienceEntry();
+                    const idx = experienceCount;
+                    if (document.getElementById(`exp-title-${idx}`)) document.getElementById(`exp-title-${idx}`).value = exp.title || '';
+                    if (document.getElementById(`exp-company-${idx}`)) document.getElementById(`exp-company-${idx}`).value = exp.company || '';
+                    if (document.getElementById(`exp-start-${idx}`)) document.getElementById(`exp-start-${idx}`).value = exp.start || '';
+                    if (document.getElementById(`exp-end-${idx}`)) document.getElementById(`exp-end-${idx}`).value = exp.end || '';
+                    if (document.getElementById(`exp-desc-${idx}`)) document.getElementById(`exp-desc-${idx}`).value = exp.desc || '';
+                });
+            }
+
+            if (Array.isArray(data.projects) && data.projects.length > 0) {
+                projectEntries.innerHTML = '';
+                projectCount = 0;
+                data.projects.forEach(proj => {
+                    addProjectEntry();
+                    const idx = projectCount;
+                    if (document.getElementById(`proj-name-${idx}`)) document.getElementById(`proj-name-${idx}`).value = proj.name || '';
+                    if (document.getElementById(`proj-desc-${idx}`)) document.getElementById(`proj-desc-${idx}`).value = proj.desc || '';
+                    if (document.getElementById(`proj-tech-${idx}`)) document.getElementById(`proj-tech-${idx}`).value = proj.tech || '';
+                });
+            }
+
+            if (Array.isArray(data.careerRecommendations) && data.careerRecommendations.length > 0) {
+                careerRecommendations = data.careerRecommendations;
+                displayResults(data.userName || 'Student', careerRecommendations[0], careerRecommendations[1] || careerRecommendations[0]);
+                changeStep(4);
+                showLiveJobs();
+                networkingAssistantContainer.classList.remove('hidden');
+            }
+        }
+
+        async function handleManualProfileSave() {
+            if (!window.FirebaseService || !window.FirebaseService.getCurrentUser()) {
+                showToast("Saved locally (Demo Session)", "info");
+                return;
+            }
+            try {
+                const profileData = collectUserProfileData();
+                await window.FirebaseService.saveUserProfile(profileData);
+                showToast("Profile synced to Firebase Cloud!", "success");
+            } catch (err) {
+                showToast(err.message, "error");
+            }
+        }
+
+        async function openResumesModal() {
+            if (!window.FirebaseService || !window.FirebaseService.getCurrentUser()) {
+                showToast("Sign in with a live Firebase account to view saved resumes.", "info");
+                return;
+            }
+            resumesModal.classList.remove('hidden');
+            resumesListContainer.innerHTML = '<p class="text-xs text-slate-500 py-4 text-center"><i class="fas fa-spinner fa-spin mr-2"></i>Loading resumes from Firebase Storage...</p>';
+
+            try {
+                const resumes = await window.FirebaseService.getUserResumes();
+                if (resumes.length === 0) {
+                    resumesListContainer.innerHTML = '<p class="text-xs text-slate-500 py-4 text-center">No resumes saved in cloud yet. Export your resume and click "Save Resume to Cloud".</p>';
+                    return;
+                }
+                resumesListContainer.innerHTML = resumes.map(r => `
+                    <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-file-pdf text-red-500 text-xl"></i>
+                            <div>
+                                <div class="text-xs font-bold text-slate-800">${r.fileName || 'Resume.pdf'}</div>
+                                <div class="text-[10px] text-slate-400">${r.createdAt ? new Date(r.createdAt.toDate()).toLocaleDateString() : 'Recent'}</div>
+                            </div>
+                        </div>
+                        <a href="${r.downloadUrl}" target="_blank" class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                            <i class="fas fa-external-link-alt"></i> View PDF
+                        </a>
+                    </div>
+                `).join('');
+            } catch (err) {
+                resumesListContainer.innerHTML = `<p class="text-xs text-red-500 py-4 text-center">Error: ${err.message}</p>`;
+            }
+        }
+
+        // ==========================================
+        // 🧙 CAREER ADVISOR WIZARD & AI LOGIC
+        // ==========================================
+        nextFromStep1Btn.addEventListener('click', () => {
+            const name = document.getElementById('name').value;
+            if (name.trim() === '' || userSkills.length === 0) {
+                showError("Please enter your name and at least one skill.", 1);
+                return;
+            }
+            showError("", 1);
+            if (buildResumeCheckbox.checked) {
+                changeStep(2);
+            } else {
+                changeStep(3);
+            }
+        });
+
+        prevToStep1Btn.addEventListener('click', () => changeStep(1));
+        nextToStep3Btn.addEventListener('click', () => changeStep(3));
+        prevFromStep3Btn.addEventListener('click', () => {
+            if (buildResumeCheckbox.checked) {
+                changeStep(2);
+            } else {
+                changeStep(1);
+            }
+        });
+
+        getAdviceBtn.addEventListener('click', getAIRecommendations);
+        startOverBtn.addEventListener('click', () => window.location.reload());
+        downloadResumeBtn.addEventListener('click', downloadResume);
+        cloudSaveResumeBtn.addEventListener('click', saveResumeToCloud);
+        cloudSaveProfileBtn.addEventListener('click', handleManualProfileSave);
+        improveInterestBtn.addEventListener('click', handleInterestImproveClick);
+        generateSummaryBtn.addEventListener('click', handleGenerateSummary);
+        interviewPrepBtn.addEventListener('click', showInterviewPrep);
+
+        skillsInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ',') {
+                e.preventDefault();
+                const skill = skillsInput.value.trim().toLowerCase();
+                if (skill && !userSkills.includes(skill)) {
+                    userSkills.push(skill);
+                    renderSkills();
+                }
+                skillsInput.value = '';
+            }
+        });
+
+        addExperienceBtn.addEventListener('click', addExperienceEntry);
+        addProjectBtn.addEventListener('click', addProjectEntry);
+
+        experienceEntries.addEventListener('click', handleDynamicImproveClick);
+        projectEntries.addEventListener('click', handleDynamicImproveClick);
+
+        mentorChatBtn.addEventListener('click', () => {
+            chatWidget.classList.add('open');
+            if (chatHistory.length === 0) {
+                const welcomeMsg = `Hi ${document.getElementById('name').value || 'there'}! I'm your AI Mentor. Ask me any follow-up question about your recommended careers, certifications, or resume.`;
+                addMessageToChat('ai', welcomeMsg);
+                chatHistory.push({ role: 'model', parts: [{ text: welcomeMsg }] });
+            }
+        });
+        closeChatBtn.addEventListener('click', () => chatWidget.classList.remove('open'));
+        chatSendBtn.addEventListener('click', handleChatMessage);
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleChatMessage();
+            }
+        });
+
+        jobOpportunitiesContainer.addEventListener('click', handleJobOpportunitiesClick);
+        resultsContent.addEventListener('click', handleLearningPlanClick);
+        generateNetworkingBtn.addEventListener('click', handleGenerateNetworkingPlan);
+        networkingPlanContent.addEventListener('click', handleNetworkingCopyClick);
+
+        function showError(message, step) {
+            const errorDiv = document.getElementById(`step-${step}-error`);
+            if (errorDiv) {
+                errorDiv.textContent = message;
+            }
+        }
+
+        function changeStep(stepNum) {
+            steps.forEach((step, index) => {
+                step.classList.toggle('hidden', index + 1 !== stepNum);
+            });
+            stepIndicators.forEach((indicator, index) => {
+                indicator.classList.toggle('step-active', index + 1 === stepNum);
+                indicator.classList.toggle('text-slate-400', index + 1 !== stepNum);
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderSkills() {
+            skillsContainer.innerHTML = '';
+            userSkills.forEach(skill => {
+                const skillTag = document.createElement('div');
+                skillTag.className = 'skill-tag';
+                skillTag.innerHTML = `<span>${skill}</span><button onclick="removeSkill('${skill}')"><i class="fas fa-times text-xs"></i></button>`;
+                skillsContainer.appendChild(skillTag);
+            });
+        }
+
+        window.removeSkill = function(skillToRemove) {
+            userSkills = userSkills.filter(skill => skill !== skillToRemove);
+            renderSkills();
+        };
+
+        function addExperienceEntry() {
+            experienceCount++;
+            const entry = document.createElement('div');
+            entry.className = 'dynamic-entry p-4 space-y-3 bg-slate-50 rounded-r-xl border border-slate-200';
+            entry.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input type="text" placeholder="Role / Title (e.g. Frontend Intern)" class="w-full px-3 py-2 border rounded-xl text-sm" id="exp-title-${experienceCount}">
+                    <input type="text" placeholder="Company / Organization" class="w-full px-3 py-2 border rounded-xl text-sm" id="exp-company-${experienceCount}">
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input type="text" placeholder="Start Date (e.g. May 2023)" class="w-full px-3 py-2 border rounded-xl text-sm" id="exp-start-${experienceCount}">
+                    <input type="text" placeholder="End Date (e.g. Present)" class="w-full px-3 py-2 border rounded-xl text-sm" id="exp-end-${experienceCount}">
+                </div>
+                <div class="relative">
+                    <textarea placeholder="Key contributions and achievements..." rows="3" class="w-full px-3 py-2 border rounded-xl text-sm" id="exp-desc-${experienceCount}"></textarea>
+                    <button class="improve-ai-btn absolute bottom-2 right-2 text-xs bg-indigo-100 text-indigo-700 font-semibold px-2 py-1 rounded-lg hover:bg-indigo-200 transition flex items-center" data-target-id="exp-desc-${experienceCount}" data-context="experience">
+                        <span class="btn-text"><i class="fas fa-wand-magic-sparkles mr-1"></i>Improve</span>
+                        <span class="spinner hidden"><i class="fas fa-spinner fa-spin"></i></span>
+                    </button>
+                </div>
+            `;
+            experienceEntries.appendChild(entry);
+        }
+
+        function addProjectEntry() {
+            projectCount++;
+            const entry = document.createElement('div');
+            entry.className = 'dynamic-entry p-4 space-y-3 bg-slate-50 rounded-r-xl border border-slate-200';
+            entry.innerHTML = `
+                <input type="text" placeholder="Project Title" class="w-full px-3 py-2 border rounded-xl text-sm" id="proj-name-${projectCount}">
+                <div class="relative">
+                    <textarea placeholder="Project overview, problem solved, and your contribution..." rows="3" class="w-full px-3 py-2 border rounded-xl text-sm" id="proj-desc-${projectCount}"></textarea>
+                    <button class="improve-ai-btn absolute bottom-2 right-2 text-xs bg-indigo-100 text-indigo-700 font-semibold px-2 py-1 rounded-lg hover:bg-indigo-200 transition flex items-center" data-target-id="proj-desc-${projectCount}" data-context="project">
+                        <span class="btn-text"><i class="fas fa-wand-magic-sparkles mr-1"></i>Improve</span>
+                        <span class="spinner hidden"><i class="fas fa-spinner fa-spin"></i></span>
+                    </button>
+                </div>
+                <input type="text" placeholder="Technologies Used (e.g. React, Node.js, Firebase)" class="w-full px-3 py-2 border rounded-xl text-sm" id="proj-tech-${projectCount}">
+            `;
+            projectEntries.appendChild(entry);
+        }
+
+        async function handleGenerateSummary() {
+            const name = document.getElementById('name').value;
+            if (name.trim() === '' || userSkills.length === 0) {
+                showError("Please enter your name and at least one skill first.", 1);
+                return;
+            }
+            showError("", 1);
+
+            summaryBtnText.classList.add('hidden');
+            summarySpinner.classList.remove('hidden');
+            generateSummaryBtn.disabled = true;
+
+            try {
+                const education = document.getElementById('education').value;
+                const fieldOfStudy = document.getElementById('field-of-study').value;
+                let educationText = education;
+                if (fieldOfStudy.trim() !== '') educationText += ` in ${fieldOfStudy}`;
+                const prompt = `Generate a 2-sentence professional bio in first person for a student with ${educationText} and skills in ${userSkills.join(', ')}. Inspiring, concise, LinkedIn-ready. No preamble.`;
+
+                const summary = await callGeminiAPI(prompt, 'summary');
+                aiSummaryText.textContent = summary;
+                aiSummaryContainer.classList.remove('hidden');
+            } catch (error) {
+                console.error("Summary error:", error);
+                showError('Could not generate summary. Please try again.', 1);
+            } finally {
+                summaryBtnText.classList.remove('hidden');
+                summarySpinner.classList.add('hidden');
+                generateSummaryBtn.disabled = false;
+            }
+        }
+
+        async function handleInterestImproveClick() {
+            const currentInterests = interestsTextarea.value;
+            if (currentInterests.trim() === '') {
+                showError("Please write something first to enhance it.", 3);
+                return;
+            }
+            showError("", 3);
+            improveBtnText.classList.add('hidden');
+            improvingSpinner.classList.remove('hidden');
+            improveInterestBtn.disabled = true;
+
+            try {
+                const prompt = `Rewrite the following student's career interest into an articulate, inspiring statement of passion and aspiration (2-3 sentences in first person). No preamble. Input: "${currentInterests}"`;
+                const improvedText = await callGeminiAPI(prompt, 'interest');
+                if (improvedText) interestsTextarea.value = improvedText;
+            } catch (error) {
+                showError('Could not improve text. Please try again.', 3);
+            } finally {
+                improveBtnText.classList.remove('hidden');
+                improvingSpinner.classList.add('hidden');
+                improveInterestBtn.disabled = false;
+            }
+        }
+
+        async function handleDynamicImproveClick(event) {
+            const button = event.target.closest('.improve-ai-btn');
+            if (!button) return;
+
+            const targetId = button.dataset.targetId;
+            const context = button.dataset.context;
+            const textarea = document.getElementById(targetId);
+
+            if (!textarea || textarea.value.trim() === '') return;
+
+            const btnText = button.querySelector('.btn-text');
+            const spinner = button.querySelector('.spinner');
+
+            btnText.classList.add('hidden');
+            spinner.classList.remove('hidden');
+            button.disabled = true;
+
+            try {
+                let prompt = '';
+                if (context === 'experience') {
+                    prompt = `Rewrite this student's experience description to be achievement-oriented, with action verbs and impact. 2-3 bullet points or short paragraph. No preamble. Text: "${textarea.value}"`;
+                } else if (context === 'project') {
+                    prompt = `Rewrite this student's project description to clearly highlight problem solved, stack used, and technical contributions. No preamble. Text: "${textarea.value}"`;
+                }
+
+                const improvedText = await callGeminiAPI(prompt, context);
+                if (improvedText) textarea.value = improvedText;
+            } catch (error) {
+                console.error(`Improve error (${context}):`, error);
+            } finally {
+                btnText.classList.remove('hidden');
+                spinner.classList.add('hidden');
+                button.disabled = false;
+            }
+        }
+
+        function addMessageToChat(role, text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${role}-message`;
+            messageDiv.textContent = text;
+            chatMessages.insertBefore(messageDiv, chatTypingIndicator);
+        }
+
+        async function handleChatMessage() {
+            const userInput = chatInput.value.trim();
+            if (userInput === '') return;
+
+            addMessageToChat('user', userInput);
+            chatInput.value = '';
+            chatTypingIndicator.classList.remove('hidden');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            chatHistory.push({ role: 'user', parts: [{ text: userInput }] });
+            if (chatHistory.length > 6) {
+                chatHistory = chatHistory.slice(-6);
+            }
+
+            try {
+                const aiResponse = await callGeminiAPI(null, 'chat', { chatHistory: chatHistory });
+                addMessageToChat('ai', aiResponse);
+                chatHistory.push({ role: 'model', parts: [{ text: aiResponse }] });
+            } catch (error) {
+                addMessageToChat('ai', `Sorry, error: ${error.message}`);
+            } finally {
+                chatTypingIndicator.classList.add('hidden');
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        }
+
+        // ==========================================
+        // 📡 CLOUDFLARE SERVERLESS API CLIENT
+        // ==========================================
+        async function callGeminiAPI(text, context, additionalData = {}, retries = 3, delay = 1000) {
+            const apiUrl = PROXY_URL;
+            let payload;
+
+            if (context === 'tts') {
+                payload = {
+                    context: 'tts',
+                    text: `Say with a professional and friendly tone: ${text}`,
+                    additionalData: additionalData
+                };
+            } else if (context === 'chat') {
+                payload = {
+                    context: 'chat',
+                    text: null,
+                    additionalData: {
+                        chatHistory: additionalData.chatHistory,
+                        careerContext: careerRecommendations.length > 0 ? `My recommended careers are ${careerRecommendations[0].title} and ${careerRecommendations[1]?.title || ''}.` : "I haven't received career recommendations yet."
+                    }
+                };
+            } else {
+                payload = {
+                    context: context,
+                    text: text,
+                    additionalData: additionalData
+                };
+            }
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    let errorBody;
+                    try {
+                        errorBody = await response.json();
+                    } catch (e) {
+                        errorBody = { message: "Cloudflare proxy error" };
+                    }
+                    throw new Error(`Proxy error (${response.status}): ${errorBody.message || 'No details provided.'}`);
+                }
+
+                const result = await response.json();
+                if (result.success === false) {
+                    throw new Error(`Proxy error: ${result.message}`);
+                }
+
+                let responseText = result.response;
+
+                if (context === 'recommendations' || context === 'interview_questions') {
+                    responseText = responseText.replace(/[\n\r\t\u0000-\u001F\u007F-\u009F]/g, '');
+                    responseText = responseText.replace(/,\s*([}\]])/g, '$1');
+                    let match = responseText.match(/\{.*\}/s);
+                    if (match) {
+                        responseText = match[0];
+                    } else {
+                        throw new Error("Invalid JSON structure received from model.");
+                    }
+                }
+
+                if (context === 'tts') {
+                    return { audioData: responseText, mimeType: 'audio/L16;rate=24000' };
+                }
+
+                return responseText.trim();
+
+            } catch (error) {
+                console.error(`Error in callGeminiAPI for context ${context}:`, error);
+
+                if (retries > 0 && (error.message.includes('429') || error.message.includes('503'))) {
+                    console.log(`Rate limit or busy. Retrying... (${retries} attempts left)`);
+                    await new Promise(res => setTimeout(res, delay));
+                    return callGeminiAPI(text, context, additionalData, retries - 1, delay * 2);
+                } else {
+                    throw error;
+                }
+            }
+        }
+
+        async function getAIRecommendations() {
+            if (interestsTextarea.value.trim() === '') {
+                showError("Please describe your interests and aspirations.", 3);
+                return;
+            }
+            showError("", 3);
+
+            btnText.classList.add('hidden');
+            loadingSpinner.classList.remove('hidden');
+            getAdviceBtn.disabled = true;
+
+            try {
+                const userNameRec = document.getElementById('name').value;
+                const educationRec = document.getElementById('education').value;
+                const fieldOfStudyRec = document.getElementById('field-of-study').value;
+                const interestsRec = interestsTextarea.value;
+                const prompt = `Act as an expert career advisor. I am ${userNameRec}, my education is ${educationRec} in ${fieldOfStudyRec}. My skills are: ${userSkills.join(', ')}. My interests are: "${interestsRec}". Based *only* on this information, recommend the top 2 career paths for me. For each path, provide: "title" (string), "description" (string, 1-2 sentences), "avgSalary" (string, in Indian currency LPA e.g. "₹8 - ₹15 LPA"), "outlook" (string, e.g., "15% Growth (High)"), "requiredSkills" (array of 5-7 key skills as strings). Return this as a single, valid JSON object with a key "careers" which is an array of the 2 career path objects. Do not include any other text, markdown formatting, or preamble. Example: {"careers": [{"title": "Software Engineer", ...}, {"title": "Data Scientist", ...}]}`;
+
+                const responseText = await callGeminiAPI(prompt, 'recommendations');
+                const data = JSON.parse(responseText);
+
+                if (data.careers && data.careers.length > 0) {
+                    careerRecommendations = data.careers;
+                    const topMatch = data.careers[0];
+                    const secondMatch = data.careers.length >= 2 
+                        ? data.careers[1] 
+                        : { 
+                            title: "Explore Adjacent Roles", 
+                            description: "Your foundational skills match high-demand tech roles. Continue exploring to broaden your options!", 
+                            avgSalary: "N/A", 
+                            outlook: "N/A", 
+                            requiredSkills: [] 
+                        };
+
+                    displayResults(document.getElementById('name').value, topMatch, secondMatch);
+                    changeStep(4);
+                    showLiveJobs();
+                    networkingAssistantContainer.classList.remove('hidden');
+
+                    // Auto-sync assessment to student's cloud account
+                    handleManualProfileSave();
+                } else {
+                    throw new Error("AI response did not contain any valid career paths.");
+                }
+            } catch (error) {
+                console.error("AI recommendations error:", error);
+                showError('Could not get AI advice. ' + error.message, 3);
+            } finally {
+                btnText.classList.remove('hidden');
+                loadingSpinner.classList.add('hidden');
+                getAdviceBtn.disabled = false;
+            }
+        }
+
+        function displayResults(userName, topMatch, secondMatch) {
+            const topMatchSkillGap = topMatch.requiredSkills.filter(skill => !userSkills.map(s => s.toLowerCase()).includes(skill.toLowerCase()));
+            const topMatchKnownSkills = topMatch.requiredSkills.filter(skill => userSkills.map(s => s.toLowerCase()).includes(skill.toLowerCase()));
+            const secondMatchSkillGap = secondMatch.requiredSkills.filter(skill => !userSkills.map(s => s.toLowerCase()).includes(skill.toLowerCase()));
+            const secondMatchKnownSkills = secondMatch.requiredSkills.filter(skill => userSkills.map(s => s.toLowerCase()).includes(skill.toLowerCase()));
+
+            resultsContent.innerHTML = `
+                <div class="mb-6">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-2">Personalized Career Advice for ${userName}!</h2>
+                    <p class="text-slate-600">Based on your academic profile, skills, and goals, here are your best-fit career pathways.</p>
+                </div>
+
+                <!-- Top Recommendation Card -->
+                <div class="border-2 border-blue-500 rounded-3xl p-6 mb-8 bg-blue-50/50 shadow-sm">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-blue-600 text-white text-xs uppercase font-extrabold px-3 py-1 rounded-full">Top Recommendation</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-blue-900">${topMatch.title}</h3>
+                    <p class="text-slate-700 mt-2 mb-4 leading-relaxed">${topMatch.description}</p>
+                    <div class="flex flex-wrap gap-4 text-sm">
+                        <div class="flex items-center"><i class="fas fa-wallet text-emerald-600 mr-2"></i>Avg. Starting Package: <span class="font-bold ml-1 text-slate-800">${topMatch.avgSalary}</span></div>
+                        <div class="flex items-center"><i class="fas fa-chart-line text-purple-600 mr-2"></i>Hiring Outlook: <span class="font-bold ml-1 text-slate-800">${topMatch.outlook}</span></div>
+                    </div>
+                </div>
+
+                <!-- Career Fit Gauge Score -->
+                <div class="mb-8 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+                    <h3 class="text-xl font-bold text-slate-900 mb-4">Role Readiness Score</h3>
+                    <div class="flex flex-col md:flex-row items-center gap-6">
+                        <div class="relative w-48 h-24">
+                            <canvas id="fitScoreChart"></canvas>
+                            <div class="absolute inset-0 flex items-end justify-center pb-1">
+                                <span class="text-2xl font-extrabold text-slate-800" id="fit-score-value">--/10</span>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-slate-600 text-sm leading-relaxed" id="fit-score-description">
+                                <i class="fas fa-spinner fa-spin mr-2"></i>Calculating alignment with campus hiring benchmarks...
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Second Recommendation -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold mb-4 text-slate-800">Alternative Path: ${secondMatch.title}</h3>
+                    <div class="border border-slate-200 rounded-3xl p-6 bg-slate-50">
+                        <p class="text-slate-700 mb-4 leading-relaxed">${secondMatch.description}</p>
+                        <div class="flex flex-wrap gap-4 text-sm mb-4">
+                            <div class="flex items-center"><i class="fas fa-wallet text-emerald-600 mr-2"></i>Avg. Salary: <span class="font-bold ml-1 text-slate-800">${secondMatch.avgSalary}</span></div>
+                            <div class="flex items-center"><i class="fas fa-chart-line text-purple-600 mr-2"></i>Hiring Outlook: <span class="font-bold ml-1 text-slate-800">${secondMatch.outlook}</span></div>
+                        </div>
+                        <div class="border-t border-slate-200 pt-4">
+                            <h4 class="font-bold text-sm mb-2 text-slate-800">Your Matching Skills</h4>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                ${secondMatchKnownSkills.length > 0 ? secondMatchKnownSkills.map(s => `<span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-1 rounded-full">${s}</span>`).join('') : '<p class="text-slate-500 text-xs">No direct matching skills yet.</p>'}
+                            </div>
+                            <h4 class="font-bold text-sm mb-2 text-slate-800">Skills to Bridge</h4>
+                            <div class="flex flex-wrap gap-2">
+                                ${secondMatchSkillGap.map(s => `<span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-full">${s}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Growth Chart -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold mb-4 text-slate-800">Projected 15-Year Market Demand</h3>
+                    <div class="border border-slate-200 rounded-3xl p-4 bg-white" style="height: 250px;">
+                        <canvas id="growthChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Skills & Learning Roadmap -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold mb-4 text-slate-800">Skill Development Roadmap</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="border border-slate-200 rounded-3xl p-5 bg-white">
+                            <h4 class="font-bold text-sm mb-3 text-slate-800"><i class="fas fa-check-circle text-emerald-500 mr-2"></i>Skills You Already Have</h4>
+                            <div class="flex flex-wrap gap-2">
+                                ${topMatchKnownSkills.length > 0 ? topMatchKnownSkills.map(s => `<span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-1 rounded-full">${s}</span>`).join('') : '<p class="text-slate-500 text-xs">No matching skills yet. Let\'s build them!</p>'}
+                            </div>
+                            <h4 class="font-bold text-sm mt-5 mb-3 text-slate-800"><i class="fas fa-lightbulb text-amber-500 mr-2"></i>Skills to Develop (Your Gap)</h4>
+                            <div class="space-y-2">
+                                ${topMatchSkillGap.length > 0 ? topMatchSkillGap.map((s, index) => `
+                                    <div class="p-3 bg-amber-50/60 rounded-2xl border border-amber-200">
+                                        <div class="flex justify-between items-center">
+                                            <span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">${s}</span>
+                                            <button class="generate-plan-btn text-xs bg-indigo-100 text-indigo-700 font-semibold px-2.5 py-1 rounded-lg hover:bg-indigo-200 transition flex items-center" data-skill="${s}" data-target-id="plan-container-${index}">
+                                                <span class="btn-text"><i class="fas fa-tasks mr-1"></i>Generate Plan</span>
+                                                <span class="spinner hidden"><i class="fas fa-spinner fa-spin"></i></span>
+                                            </button>
+                                        </div>
+                                        <div id="plan-container-${index}" class="hidden mt-2 text-xs text-slate-700"></div>
+                                    </div>
+                                `).join('') : '<p class="text-slate-500 text-xs">No skill gaps found for this role. Excellent readiness!</p>'}
+                            </div>
+                        </div>
+
+                        <div class="border border-slate-200 rounded-3xl p-5 bg-white">
+                            <h4 class="font-bold text-sm mb-3 text-slate-800"><i class="fas fa-book-open text-blue-500 mr-2"></i>Recommended Free Learning Resources</h4>
+                            <ul class="space-y-2.5">
+                                ${topMatchSkillGap.slice(0, 5).map(skill => {
+                                    const resource = learningResources[skill.toLowerCase()];
+                                    return resource ? `<li><a href="${resource.url}" target="_blank" class="text-blue-600 hover:underline text-xs flex items-center gap-1.5"><i class="fas fa-external-link-alt text-[10px]"></i> ${resource.title} for ${skill}</a></li>` : '';
+                                }).join('')}
+                                ${topMatchSkillGap.length > 5 ? `<li><p class="text-xs text-slate-500">...and more specialized tracks!</p></li>` : ''}
+                                ${topMatchSkillGap.length === 0 ? `<li><p class="text-xs text-slate-500">You already possess all core foundational skills!</p></li>` : ''}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            if (buildResumeCheckbox.checked) {
+                downloadResumeBtn.classList.remove('hidden');
+                cloudSaveResumeBtn.classList.remove('hidden');
+            }
+
+            setTimeout(() => {
+                const ctxGrowth = document.getElementById('growthChart');
+                if (ctxGrowth) {
+                    const existingChart = Chart.getChart(ctxGrowth);
+                    if (existingChart) existingChart.destroy();
+                    renderGrowthChart(topMatch);
+                }
+                calculateAndRenderFitScore(topMatch);
+            }, 0);
+        }
+
+        async function calculateAndRenderFitScore(career) {
+            const ctxFit = document.getElementById('fitScoreChart');
+            const scoreValueEl = document.getElementById('fit-score-value');
+            const descriptionEl = document.getElementById('fit-score-description');
+
+            if (!ctxFit) return;
+
+            const requiredSkills = career.requiredSkills || [];
+            const userSkillsLower = userSkills.map(s => s.toLowerCase());
+            let matchCount = 0;
+            requiredSkills.forEach(reqSkill => {
+                if (userSkillsLower.some(us => us.includes(reqSkill.toLowerCase()) || reqSkill.toLowerCase().includes(us))) {
+                    matchCount++;
+                }
+            });
+
+            let scoreFromSkills = (matchCount / Math.max(requiredSkills.length, 1)) * 10;
+            let educationRelevance = (document.getElementById('field-of-study')?.value.toLowerCase().includes(career.title.toLowerCase().substring(0, 5))) ? 1.5 : 0;
+
+            let finalScore = Math.min(scoreFromSkills + educationRelevance, 10);
+            if (finalScore < 3) finalScore += 1;
+            finalScore = Math.min(finalScore, 9.6);
+            finalScore = Number(finalScore.toFixed(1));
+
+            scoreValueEl.textContent = `${finalScore}/10`;
+
+            new Chart(ctxFit.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Fit', 'Gap'],
+                    datasets: [{
+                        data: [finalScore, 10 - finalScore],
+                        backgroundColor: [
+                            finalScore >= 7 ? '#22c55e' : (finalScore >= 4 ? '#f59e0b' : '#ef4444'),
+                            '#e2e8f0'
+                        ],
+                        borderWidth: 0,
+                        circumference: 180,
+                        rotation: 270,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    }
+                }
+            });
+
+            try {
+                const prompt = `Analyze student profile fit for "${career.title}" requiring [${requiredSkills.join(', ')}]. Student skills: [${userSkills.join(', ')}]. Fit score: ${finalScore}/10. 2 brief sentences. First sentence: Acknowledge score and a key strength. Second sentence: Single most important action to reach 10/10.`;
+                const fitResponse = await callGeminiAPI(prompt, 'chat', {
+                    chatHistory: [{ role: 'user', parts: [{ text: prompt }] }],
+                    careerContext: "Career Fit Analysis"
+                });
+                descriptionEl.textContent = fitResponse;
+            } catch (error) {
+                descriptionEl.textContent = `Your profile shows strong potential for ${career.title}. Focus on closing identified skill gaps to boost your campus hiring readiness.`;
+            }
+        }
+
+        function showLiveJobs() {
+            if (careerRecommendations.length === 0) return;
+            jobOpportunitiesContainer.classList.remove('hidden');
+
+            const topCareerTitle = careerRecommendations[0].title;
+            const secondCareerTitle = careerRecommendations[1]?.title || 'Analyst';
+
+            const mockJobs = [
+                { title: topCareerTitle, company: 'Innovatech Cloud Solutions', location: 'Bengaluru / Remote, IND', description: 'Seeking a proactive graduate to engineer scalable modern software systems.' },
+                { title: topCareerTitle, company: 'NextGen Digital Labs', location: 'Hyderabad, IND', description: 'Join our campus hiring batch to build high-availability backend microservices.' },
+                { title: secondCareerTitle, company: 'Apex Enterprise Systems', location: 'Pune / Mumbai, IND', description: 'Analyze business workflows, build automated data pipelines, and drive strategy.' }
+            ];
+
+            let jobsHTML = `
+                <div class="mb-4">
+                    <h3 class="text-xl font-bold text-slate-900">Campus & Live Job Matches</h3>
+                    <p class="text-xs text-slate-500">Generate targeted cover letters tailored to these open roles in 1 click.</p>
+                </div>
+            `;
+            mockJobs.forEach((job, index) => {
+                jobsHTML += `
+                    <div class="border border-slate-200 rounded-2xl p-4 mb-3 bg-white">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                <h4 class="font-bold text-base text-slate-800">${job.title}</h4>
+                                <p class="text-xs font-semibold text-slate-500">${job.company} • ${job.location}</p>
+                                <p class="text-xs text-slate-600 mt-1">${job.description}</p>
+                            </div>
+                            <button class="generate-cover-letter-btn text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-semibold px-3 py-1.5 rounded-xl transition flex-shrink-0 flex items-center" data-job-index="${index}">
+                                <span class="btn-text"><i class="fas fa-file-alt mr-1.5"></i>Generate Cover Letter</span>
+                                <span class="spinner hidden"><i class="fas fa-spinner fa-spin mr-1.5"></i>Writing...</span>
+                            </button>
+                        </div>
+                        <div id="cover-letter-container-${index}" class="hidden mt-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                             <textarea class="w-full h-40 text-xs border-slate-300 rounded-xl p-2.5 font-sans leading-relaxed"></textarea>
+                             <div class="flex justify-end mt-2">
+                                <button class="copy-cover-letter-btn text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1 rounded-lg font-semibold">Copy Cover Letter</button>
+                             </div>
+                        </div>
+                    </div>
+                `;
+            });
+            jobOpportunitiesContainer.innerHTML = jobsHTML;
+        }
+
+        async function handleJobOpportunitiesClick(event) {
+            const generateBtn = event.target.closest('.generate-cover-letter-btn');
+            const copyBtn = event.target.closest('.copy-cover-letter-btn');
+
+            if (generateBtn) {
+                const jobIndex = generateBtn.dataset.jobIndex;
+                const container = document.getElementById(`cover-letter-container-${jobIndex}`);
+                const textarea = container.querySelector('textarea');
+
+                const btnText = generateBtn.querySelector('.btn-text');
+                const spinner = generateBtn.querySelector('.spinner');
+
+                btnText.classList.add('hidden');
+                spinner.classList.remove('hidden');
+                generateBtn.disabled = true;
+
+                try {
+                    const topCareerTitle = careerRecommendations[0].title;
+                    const secondCareerTitle = careerRecommendations[1]?.title || 'Analyst';
+                    const mockJobs = [
+                        { title: topCareerTitle, company: 'Innovatech Cloud Solutions', location: 'Bengaluru / Remote, IND', description: 'Seeking a proactive graduate to engineer scalable modern software systems.' },
+                        { title: topCareerTitle, company: 'NextGen Digital Labs', location: 'Hyderabad, IND', description: 'Join our campus hiring batch to build high-availability backend microservices.' },
+                        { title: secondCareerTitle, company: 'Apex Enterprise Systems', location: 'Pune / Mumbai, IND', description: 'Analyze business workflows, build automated data pipelines, and drive strategy.' }
+                    ];
+                    const job = mockJobs[jobIndex];
+
+                    const userNameCL = document.getElementById('name').value;
+                    const summaryCL = aiSummaryText.textContent || document.getElementById('interests').value;
+                    const prompt = `You are a professional career coach for students. Write a compelling cover letter for ${userNameCL} applying for ${job.title} at ${job.company}. Summary: "${summaryCL}". Skills: ${userSkills.join(', ')}. Job description: "${job.description}". Professional, 3 paragraphs, highlight campus projects and skill match, addressed to "Hiring Team".`;
+
+                    const coverLetter = await callGeminiAPI(prompt, 'cover_letter');
+                    textarea.value = coverLetter;
+                    container.classList.remove('hidden');
+                } catch (error) {
+                    textarea.value = "Sorry, couldn't generate the cover letter. Please try again.";
+                    container.classList.remove('hidden');
+                } finally {
+                    btnText.classList.remove('hidden');
+                    spinner.classList.add('hidden');
+                    generateBtn.disabled = false;
+                }
+            }
+
+            if (copyBtn) {
+                const container = copyBtn.closest('[id^="cover-letter-container-"]');
+                const textarea = container.querySelector('textarea');
+                textarea.select();
+                navigator.clipboard.writeText(textarea.value);
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => { copyBtn.textContent = 'Copy Cover Letter'; }, 2000);
+            }
+        }
+
+        async function handleLearningPlanClick(event) {
+            const button = event.target.closest('.generate-plan-btn');
+            if (!button) return;
+
+            const skill = button.dataset.skill;
+            const targetId = button.dataset.targetId;
+            const container = document.getElementById(targetId);
+
+            if (!skill || !container) return;
+
+            const btnText = button.querySelector('.btn-text');
+            const spinner = button.querySelector('.spinner');
+
+            if (container.classList.contains('hidden')) {
+                btnText.classList.add('hidden');
+                spinner.classList.remove('hidden');
+                button.disabled = true;
+
+                try {
+                    const careerTitlePlan = careerRecommendations.length > 0 ? careerRecommendations[0].title : "target role";
+                    const prompt = `You are a student mentor. Create a simple 3-step actionable micro-plan for a student to master "${skill}" targeting "${careerTitlePlan}". Concrete steps (1. Learn..., 2. Build..., 3. Showcase...). Return only the 3 numbered steps.`;
+
+                    const plan = await callGeminiAPI(prompt, 'learning_plan');
+                    container.innerHTML = `<div class="p-3 bg-indigo-50/50 rounded-xl border border-indigo-100 mt-2">${plan.replace(/\n/g, '<br>')}</div>`;
+                    container.classList.remove('hidden');
+                    btnText.innerHTML = '<i class="fas fa-eye-slash mr-1"></i>Hide Plan';
+                } catch (error) {
+                    container.innerHTML = `<p class="text-red-500 text-xs p-2">Failed to generate plan. Please try again.</p>`;
+                    container.classList.remove('hidden');
+                } finally {
+                    btnText.classList.remove('hidden');
+                    spinner.classList.add('hidden');
+                    button.disabled = false;
+                }
+            } else {
+                container.classList.add('hidden');
+                btnText.innerHTML = '<i class="fas fa-tasks mr-1"></i>Generate Plan';
+            }
+        }
+
+        async function handleGenerateNetworkingPlan() {
+            if (careerRecommendations.length === 0) {
+                showError("Please get career recommendations first.", 4);
+                return;
+            }
+
+            const btnText = generateNetworkingBtn.querySelector('.btn-text');
+            const spinner = generateNetworkingBtn.querySelector('.spinner');
+
+            btnText.classList.add('hidden');
+            spinner.classList.remove('hidden');
+            generateNetworkingBtn.disabled = true;
+            networkingPlanContent.classList.add('hidden');
+
+            try {
+                const careerTitle = careerRecommendations[0].title;
+                const userNameNet = document.getElementById('name').value || 'a student';
+                const userSkillsNet = userSkills.join(', ') || 'relevant skills';
+                const prompt = `Act as a college networking coach for ${userNameNet}, target role ${careerTitle}, skills: ${userSkillsNet}. Generate a networking plan with two sections:
+                1. "**Who to Connect With:**" Bulleted list of 3 specific types of professionals/alumni on LinkedIn.
+                2. "**Outreach Message Templates:**" 2 distinct, professional LinkedIn connection messages (under 280 chars each) with placeholders like [Name].`;
+
+                const planText = await callGeminiAPI(prompt, 'networking_plan');
+
+                let formattedPlan = planText
+                    .replace(/\*\*(.*?)\*\*/g, '<h4 class="font-bold text-slate-800 mt-4 mb-2 text-sm">$1</h4>')
+                    .replace(/^- (.*?)$/gm, '<li class="ml-4 list-disc text-xs text-slate-600 mb-1">$1</li>')
+                    .replace(/^\d+\. (.*?)$/gm, '<li class="ml-4 list-decimal text-xs text-slate-600 mb-2">$1</li>');
+
+                networkingPlanContent.innerHTML = `<div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">${formattedPlan}</div>`;
+                networkingPlanContent.classList.remove('hidden');
+            } catch (error) {
+                networkingPlanContent.innerHTML = `<p class="text-red-500 text-xs">Error generating networking plan: ${error.message}</p>`;
+                networkingPlanContent.classList.remove('hidden');
+            } finally {
+                btnText.classList.remove('hidden');
+                spinner.classList.add('hidden');
+                generateNetworkingBtn.disabled = false;
+            }
+        }
+
+        async function handleNetworkingCopyClick(event) {
+            const copyBtn = event.target.closest('.copy-networking-template');
+            if (copyBtn) {
+                const text = copyBtn.dataset.template;
+                await navigator.clipboard.writeText(text);
+                copyBtn.innerHTML = '<i class="fas fa-check mr-1"></i>Copied!';
+                setTimeout(() => { copyBtn.innerHTML = '<i class="fas fa-copy mr-1"></i>Copy'; }, 2000);
+            }
+        }
+
+        function renderGrowthChart(career) {
+            const ctx = document.getElementById('growthChart');
+            if (!ctx) return;
+
+            let baseGrowth = 0.03;
+            const currentYear = new Date().getFullYear();
+            const years = Array.from({ length: 15 }, (_, i) => currentYear - 7 + i);
+            let growthData = [];
+            let currentJobs = 50;
+
+            for (let i = 0; i < 15; i++) {
+                const fluctuation = (Math.random() - 0.4) * 4;
+                const growthFactor = 1 + (baseGrowth + (Math.random() - 0.5) * 0.01);
+                currentJobs = currentJobs * growthFactor + fluctuation;
+                growthData.push(Math.max(currentJobs, 10));
+            }
+
+            new Chart(ctx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: 'Relative Job Market Index',
+                        data: growthData,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { title: { display: true, text: 'Market Index' } },
+                        x: { title: { display: true, text: 'Year' } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function buildResumePDFDocument() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'p',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            const name = document.getElementById('name').value || "Candidate";
+            const email = document.getElementById('email').value || "";
+            const phone = document.getElementById('phone').value || "";
+            const linkedin = document.getElementById('linkedin').value || "";
+            const education = document.getElementById('education').value || "";
+            const fieldOfStudy = document.getElementById('field-of-study').value || "";
+            const summary = aiSummaryText.textContent || document.getElementById('interests').value || "";
+
+            const margin = 20;
+            let yPos = margin;
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(20);
+            doc.text(name.toUpperCase(), margin, yPos);
+            yPos += 8;
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9.5);
+            doc.text(`${email} | ${phone} | ${linkedin}`, margin, yPos);
+            yPos += 8;
+            doc.setDrawColor(200, 200, 200);
+            doc.line(margin, yPos - 3, 190, yPos - 3);
+
+            if (summary) {
+                yPos += 4;
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(11);
+                doc.text("PROFESSIONAL SUMMARY", margin, yPos);
+                yPos += 5;
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(9.5);
+                const summaryLines = doc.splitTextToSize(summary, 170);
+                doc.text(summaryLines, margin, yPos);
+                yPos += (summaryLines.length * 4) + 4;
+            }
+
+            if (userSkills.length > 0) {
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(11);
+                doc.text("TECHNICAL & CORE SKILLS", margin, yPos);
+                yPos += 5;
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(9.5);
+                const skillsLines = doc.splitTextToSize(userSkills.join(', '), 170);
+                doc.text(skillsLines, margin, yPos);
+                yPos += (skillsLines.length * 4) + 4;
+            }
+
+            if (experienceCount > 0) {
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(11);
+                doc.text("WORK & INTERNSHIP EXPERIENCE", margin, yPos);
+                yPos += 5;
+                for (let i = 1; i <= experienceCount; i++) {
+                    const title = document.getElementById(`exp-title-${i}`)?.value || '';
+                    const company = document.getElementById(`exp-company-${i}`)?.value || '';
+                    const start = document.getElementById(`exp-start-${i}`)?.value || '';
+                    const end = document.getElementById(`exp-end-${i}`)?.value || '';
+                    const desc = document.getElementById(`exp-desc-${i}`)?.value || '';
+
+                    if (!title && !company) continue;
+
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(9.5);
+                    doc.text(`${title.toUpperCase()} | ${company}`, margin, yPos);
+
+                    doc.setFont("helvetica", "italic");
+                    doc.text(`${start} - ${end}`, 190, yPos, { align: 'right' });
+                    yPos += 4.5;
+
+                    doc.setFont("helvetica", "normal");
+                    const descLines = doc.splitTextToSize(desc.replace(/•/g, '-'), 165);
+                    doc.text(descLines, margin + 4, yPos);
+                    yPos += (descLines.length * 4) + 3;
+                }
+            }
+
+            if (projectCount > 0) {
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(11);
+                doc.text("FEATURED PROJECTS", margin, yPos);
+                yPos += 5;
+                for (let i = 1; i <= projectCount; i++) {
+                    const pName = document.getElementById(`proj-name-${i}`)?.value || '';
+                    const desc = document.getElementById(`proj-desc-${i}`)?.value || '';
+                    const tech = document.getElementById(`proj-tech-${i}`)?.value || '';
+
+                    if (!pName) continue;
+
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(9.5);
+                    doc.text(pName.toUpperCase(), margin, yPos);
+                    yPos += 4.5;
+
+                    doc.setFont("helvetica", "normal");
+                    const descLines = doc.splitTextToSize(desc.replace(/•/g, '-'), 165);
+                    doc.text(descLines, margin + 4, yPos);
+                    yPos += (descLines.length * 4) + 2;
+
+                    doc.setFont("helvetica", "italic");
+                    doc.text(`Technologies: ${tech}`, margin + 4, yPos);
+                    yPos += 5;
+                }
+            }
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.text("EDUCATION", margin, yPos);
+            yPos += 5;
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(9.5);
+            doc.text(education, margin, yPos);
+            yPos += 4.5;
+            doc.setFont("helvetica", "normal");
+            doc.text(fieldOfStudy, margin, yPos);
+
+            return doc;
+        }
+
+        function downloadResume() {
+            try {
+                const doc = buildResumePDFDocument();
+                const name = document.getElementById('name').value || "Student";
+                doc.save(`${name.replace(/\s+/g, '_')}_Resume.pdf`);
+                showToast("Resume downloaded!", "success");
+            } catch (e) {
+                console.error("PDF error:", e);
+                showToast("Could not generate PDF. Please verify fields.", "error");
+            }
+        }
+
+        async function saveResumeToCloud() {
+            if (!window.FirebaseService || !window.FirebaseService.getCurrentUser()) {
+                showToast("Save to Cloud requires a live Firebase sign-in.", "info");
+                return;
+            }
+
+            const originalHTML = cloudSaveResumeBtn.innerHTML;
+            cloudSaveResumeBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Uploading...';
+            cloudSaveResumeBtn.disabled = true;
+
+            try {
+                const doc = buildResumePDFDocument();
+                const pdfBlob = doc.output('blob');
+                const name = document.getElementById('name').value || "Student";
+                const filename = `${name.replace(/\s+/g, '_')}_Resume.pdf`;
+
+                await window.FirebaseService.uploadResumePDF(pdfBlob, filename);
+                showToast("Resume saved to Firebase Cloud Storage!", "success");
+                cloudSaveResumeBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Saved to Cloud!';
+                setTimeout(() => {
+                    cloudSaveResumeBtn.innerHTML = originalHTML;
+                    cloudSaveResumeBtn.disabled = false;
+                }, 2500);
+            } catch (err) {
+                console.error("Cloud resume save failed:", err);
+                showToast(err.message, "error");
+                cloudSaveResumeBtn.innerHTML = originalHTML;
+                cloudSaveResumeBtn.disabled = false;
+            }
+        }
+
+        // ==========================================
+        // 🎙️ LIVE VOICE MOCK INTERVIEW
+        // ==========================================
+        function showInterviewPrep() {
+            const interviewPrepContainer = document.getElementById('interview-prep-container');
+            if (careerRecommendations.length === 0) {
+                alert("Please get your career recommendations first!");
+                return;
+            }
+            interviewPrepContainer.classList.remove('hidden');
+            interviewPrepContainer.innerHTML = `
+                <h3 class="text-xl font-bold text-slate-900 mb-2">Live Voice Interview Practice</h3>
+                <p class="text-slate-600 text-xs mb-4">Simulate a campus technical and behavioral round with Gemini voice audio and real-time feedback.</p>
+                <div class="mb-4">
+                    <label for="career-select" class="block text-xs font-semibold text-slate-700 mb-1">Target Role:</label>
+                    <select id="career-select" class="w-full md:w-1/2 px-3.5 py-2 border border-slate-300 rounded-xl text-sm bg-white">
+                        <option value="0">${careerRecommendations[0].title}</option>
+                        ${careerRecommendations.length >= 2 ? `<option value="1">${careerRecommendations[1].title}</option>` : ''}
+                    </select>
+                </div>
+                <button id="start-interview-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2 rounded-xl transition text-sm">Start Interview</button>
+                <div id="live-interview-room" class="hidden mt-4"></div>
+            `;
+            const startInterviewBtn = document.getElementById('start-interview-btn');
+            const careerSelect = document.getElementById('career-select');
+            startInterviewBtn.addEventListener('click', () => {
+                startInterview(careerSelect.value);
+            });
+        }
+
+        async function startInterview(careerIndex) {
+            const interviewRoom = document.getElementById('live-interview-room');
+            const startButton = document.getElementById('start-interview-btn');
+            startButton.textContent = 'Preparing Questions...';
+            startButton.disabled = true;
+
+            const careerTitle = careerRecommendations[careerIndex].title;
+
+            try {
+                const prompt = `Generate 3 behavioral and 2 technical interview questions for a college graduate applying for ${careerTitle}. Return as single JSON object {"questions": ["q1", "q2", ...]}. No preamble.`;
+                const responseText = await callGeminiAPI(prompt, 'interview_questions');
+                const data = JSON.parse(responseText);
+
+                if (!data.questions || data.questions.length === 0) {
+                    throw new Error("No questions returned.");
+                }
+
+                interviewState.questions = data.questions;
+                interviewState.currentQuestionIndex = 0;
+                interviewState.isInterviewActive = true;
+
+                document.getElementById('career-select').parentElement.classList.add('hidden');
+                startButton.classList.add('hidden');
+                interviewRoom.classList.remove('hidden');
+
+                interviewRoom.innerHTML = `
+                    <div class="border-t border-slate-200 pt-4">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="w-10 h-10 rounded-2xl bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-800">AI Campus Interviewer</h4>
+                                <p id="interviewer-status" class="text-xs text-slate-500">Speaking question...</p>
+                            </div>
+                        </div>
+                        <div id="question-display" class="p-4 bg-slate-50 rounded-2xl min-h-[60px] text-slate-800 font-semibold text-sm border border-slate-200"></div>
+                        <div id="feedback-display" class="mt-3 text-xs text-slate-600"></div>
+                        <div class="mt-4">
+                            <textarea id="answer-transcript" rows="3" class="w-full p-3 border rounded-xl text-sm" placeholder="Your spoken answer will appear here..."></textarea>
+                            <button id="record-btn" class="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-xl transition text-sm flex items-center justify-center" disabled>
+                                <i class="fas fa-microphone mr-2"></i>
+                                <span id="record-btn-text">Start Recording Answer</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                askNextQuestion();
+                document.getElementById('record-btn').addEventListener('click', toggleRecording);
+
+            } catch (error) {
+                console.error("Start interview error:", error);
+                interviewRoom.innerHTML = `<p class="text-red-500 text-xs">Could not start interview: ${error.message}</p>`;
+                startButton.textContent = 'Start Interview';
+                startButton.disabled = false;
+            }
+        }
+
+        async function speak(text) {
+            const interviewerStatus = document.getElementById('interviewer-status');
+            try {
+                if (interviewerStatus) interviewerStatus.textContent = "Speaking...";
+                const result = await callGeminiAPI(text, 'tts');
+
+                if (result && result.audioData) {
+                    const sampleRate = parseInt(result.mimeType.match(/rate=(\d+)/)?.[1], 10) || 24000;
+                    const pcmData = base64ToArrayBuffer(result.audioData);
+                    const pcm16 = new Int16Array(pcmData);
+                    const wavBlob = pcmToWav(pcm16, sampleRate);
+                    const audioUrl = URL.createObjectURL(wavBlob);
+
+                    return new Promise((resolve) => {
+                        ttsAudio.src = audioUrl;
+                        ttsAudio.onended = () => {
+                            if (interviewerStatus) interviewerStatus.textContent = "Waiting for your answer...";
+                            resolve();
+                        };
+                        ttsAudio.play().catch(() => resolve());
+                    });
+                }
+            } catch (error) {
+                console.warn("TTS fallback to browser speech synthesis:", error);
+                if ('speechSynthesis' in window) {
+                    return new Promise((resolve) => {
+                        const utterance = new SpeechSynthesisUtterance(text);
+                        utterance.onend = () => {
+                            if (interviewerStatus) interviewerStatus.textContent = "Waiting for your answer...";
+                            resolve();
+                        };
+                        window.speechSynthesis.speak(utterance);
+                    });
+                }
+            }
+        }
+
+        function base64ToArrayBuffer(base64) {
+            const binaryString = window.atob(base64);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        function pcmToWav(pcmData, sampleRate) {
+            const numChannels = 1;
+            const bitsPerSample = 16;
+            const dataSize = pcmData.length * 2;
+            const blockAlign = 2;
+            const byteRate = sampleRate * blockAlign;
+            const buffer = new ArrayBuffer(44 + dataSize);
+            const view = new DataView(buffer);
+
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, 36 + dataSize, true);
+            writeString(view, 8, 'WAVE');
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, numChannels, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, byteRate, true);
+            view.setUint16(32, blockAlign, true);
+            view.setUint16(34, bitsPerSample, true);
+            writeString(view, 36, 'data');
+            view.setUint32(40, dataSize, true);
+
+            for (let i = 0; i < pcmData.length; i++) {
+                view.setInt16(44 + i * 2, pcmData[i], true);
+            }
+            return new Blob([view], { type: 'audio/wav' });
+        }
+
+        function writeString(view, offset, string) {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        }
+
+        function initializeSpeechRecognition() {
+            window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (window.SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.lang = 'en-US';
+
+                recognition.onresult = (event) => {
+                    let interimTranscript = '';
+                    let finalTranscript = '';
+                    for (let i = event.resultIndex; i < event.results.length; ++i) {
+                        if (event.results[i].isFinal) {
+                            finalTranscript += event.results[i][0].transcript;
+                        } else {
+                            interimTranscript += event.results[i][0].transcript;
+                        }
+                    }
+                    const answerInput = document.getElementById('answer-transcript');
+                    if (answerInput) answerInput.value = answerTranscript + finalTranscript + interimTranscript;
+                };
+
+                recognition.onend = () => {
+                    if (isRecording) {
+                        try { recognition.start(); } catch (e) {}
+                    }
+                };
+
+                recognition.onerror = () => {
+                    stopRecording();
+                };
+            }
+        }
+
+        async function askNextQuestion() {
+            const questionDisplay = document.getElementById('question-display');
+            const feedbackDisplay = document.getElementById('feedback-display');
+            const answerInput = document.getElementById('answer-transcript');
+            const recordBtn = document.getElementById('record-btn');
+            const recordBtnText = document.getElementById('record-btn-text');
+            const interviewerStatus = document.getElementById('interviewer-status');
+
+            if (!questionDisplay) return;
+
+            feedbackDisplay.innerHTML = '';
+            answerInput.value = '';
+            answerTranscript = '';
+
+            if (interviewState.currentQuestionIndex < interviewState.questions.length) {
+                const question = interviewState.questions[interviewState.currentQuestionIndex];
+                questionDisplay.textContent = question;
+                recordBtn.disabled = true;
+                recordBtnText.textContent = "Listening to question...";
+
+                await speak(`Question ${interviewState.currentQuestionIndex + 1}. ${question}`);
+
+                recordBtn.disabled = false;
+                recordBtnText.textContent = "Start Recording Answer";
+                recordBtn.classList.remove('recording', 'processing');
+                interviewerStatus.textContent = "Ready for your answer...";
+            } else {
+                endInterview();
+            }
+        }
+
+        function toggleRecording() {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        }
+
+        function startRecording() {
+            if (!recognition) initializeSpeechRecognition();
+            if (!recognition) return;
+
+            const recordBtn = document.getElementById('record-btn');
+            const recordBtnText = document.getElementById('record-btn-text');
+            const answerInput = document.getElementById('answer-transcript');
+            const interviewerStatus = document.getElementById('interviewer-status');
+
+            answerTranscript = answerInput.value + ' ';
+            recognition.start();
+            isRecording = true;
+
+            recordBtn.classList.add('recording');
+            recordBtnText.innerHTML = '<i class="fas fa-stop mr-2"></i>Stop & Submit Answer';
+            interviewerStatus.textContent = "Listening to your answer...";
+        }
+
+        function stopRecording() {
+            if (recognition) {
+                recognition.stop();
+            }
+            isRecording = false;
+
+            const recordBtn = document.getElementById('record-btn');
+            const recordBtnText = document.getElementById('record-btn-text');
+            const interviewerStatus = document.getElementById('interviewer-status');
+
+            recordBtn.classList.remove('recording');
+            recordBtn.classList.add('processing');
+            recordBtnText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Analyzing Answer...';
+            recordBtn.disabled = true;
+            interviewerStatus.textContent = "Analyzing response...";
+
+            setTimeout(handleSubmitAnswer, 600);
+        }
+
+        async function handleSubmitAnswer() {
+            const answerInput = document.getElementById('answer-transcript');
+            const answer = answerInput ? answerInput.value.trim() : '';
+            if (answer === '') {
+                askNextQuestion();
+                return;
+            }
+
+            const feedbackDisplay = document.getElementById('feedback-display');
+            const currentQuestion = interviewState.questions[interviewState.currentQuestionIndex];
+
+            try {
+                const prompt = `You are an AI campus interviewer giving feedback. Question: "${currentQuestion}". Student Answer: "${answer}". Provide 1-2 brief sentences evaluating clarity, STAR technique, or correctness. Direct feedback without preamble.`;
+                const feedback = await callGeminiAPI(prompt, 'interview_feedback');
+
+                feedbackDisplay.innerHTML = `<p class="p-3 bg-indigo-50 border border-indigo-200 rounded-xl"><strong class="text-indigo-800">Interviewer Feedback:</strong> ${feedback}</p>`;
+                await speak(`Feedback: ${feedback}`);
+
+                interviewState.currentQuestionIndex++;
+                askNextQuestion();
+            } catch (error) {
+                feedbackDisplay.textContent = "Good attempt. Moving to the next question.";
+                interviewState.currentQuestionIndex++;
+                setTimeout(askNextQuestion, 2000);
+            }
+        }
+
+        async function endInterview() {
+            const interviewRoom = document.getElementById('live-interview-room');
+            interviewRoom.innerHTML = `
+                <div class="text-center p-6 bg-emerald-50 border border-emerald-200 rounded-2xl">
+                    <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-2 text-xl">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <h4 class="text-lg font-bold text-emerald-900">Practice Session Complete!</h4>
+                    <p class="text-emerald-700 text-xs mt-1">Great practice. Confidence and clarity are key to landing top offers.</p>
+                </div>
+            `;
+            await speak("You have completed the interview practice session. Well done!");
+            interviewState.isInterviewActive = false;
+        }
+
+        // ==========================================
+        // 🚀 INITIALIZATION
+        // ==========================================
+        function init() {
+            changeStep(1);
+            addExperienceEntry();
+            addProjectEntry();
+            initializeSpeechRecognition();
+            initAuth();
+        }
+
+        init();
+    })();
+</script>
+</body>
+</html>
