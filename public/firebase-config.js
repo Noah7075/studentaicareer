@@ -78,7 +78,37 @@ const firebaseConfig = {
                 throw new Error("Firebase is not configured. Please paste your Firebase credentials into firebase-config.js.");
             }
             const provider = new firebase.auth.GoogleAuthProvider();
-            return auth.signInWithPopup(provider);
+            provider.setCustomParameters({ prompt: 'select_account' });
+            try {
+                return await auth.signInWithPopup(provider);
+            } catch (err) {
+                // If popup was blocked by browser, automatically attempt redirect
+                if (err.code === 'auth/popup-blocked') {
+                    console.warn("Popup blocked by browser. Automatically trying signInWithRedirect...");
+                    return await auth.signInWithRedirect(provider);
+                }
+                throw err;
+            }
+        },
+
+        signInWithGoogleRedirect: async () => {
+            if (!isInitialized || !auth) {
+                throw new Error("Firebase is not configured. Please paste your Firebase credentials into firebase-config.js.");
+            }
+            const provider = new firebase.auth.GoogleAuthProvider();
+            provider.setCustomParameters({ prompt: 'select_account' });
+            return auth.signInWithRedirect(provider);
+        },
+
+        checkRedirectResult: async () => {
+            if (!isInitialized || !auth) return null;
+            try {
+                const result = await auth.getRedirectResult();
+                return result ? result.user : null;
+            } catch (err) {
+                console.error("Firebase redirect result error:", err);
+                throw err;
+            }
         },
 
         signInWithEmail: async (email, password) => {

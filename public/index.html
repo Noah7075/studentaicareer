@@ -279,24 +279,25 @@
             </div>
 
             <!-- Google Sign-In Button -->
-            <button id="auth-google-btn" class="w-full flex items-center justify-center gap-3 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold py-3 px-4 rounded-xl transition shadow-sm mb-4 text-sm">
-                <svg class="w-5 h-5" viewBox="0 0 24 24">
+            <button id="auth-google-btn" type="button" class="w-full flex items-center justify-center gap-3 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold py-3 px-4 rounded-xl transition shadow-sm mb-3 text-sm active:scale-[0.99] disabled:opacity-75">
+                <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
                 </svg>
-                <span>Continue with Google</span>
+                <span id="auth-google-text">Continue with Google</span>
+                <span id="auth-google-spinner" class="hidden items-center gap-2 text-blue-600 font-semibold"><i class="fas fa-spinner fa-spin"></i> Connecting to Google...</span>
             </button>
+
+            <!-- Prominent Auth Feedback Alert -->
+            <div id="auth-error-alert" class="hidden mb-4 p-3.5 bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl leading-relaxed"></div>
 
             <div class="relative flex py-2 items-center mb-4">
                 <div class="flex-grow border-t border-slate-200"></div>
                 <span class="flex-shrink mx-3 text-slate-400 text-xs uppercase tracking-wider font-semibold">Or with Student Email</span>
                 <div class="flex-grow border-t border-slate-200"></div>
             </div>
-
-            <!-- Auth Error Message -->
-            <div id="auth-error-alert" class="hidden mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl"></div>
 
             <form id="email-auth-form" class="space-y-3.5">
                 <div id="auth-name-field" class="hidden">
@@ -317,9 +318,14 @@
                 </button>
             </form>
 
-            <div class="text-center mt-5 pt-4 border-t border-slate-100 text-xs text-slate-500">
-                <span id="auth-toggle-prompt">First time here?</span>
-                <button id="auth-toggle-btn" class="text-blue-600 font-bold hover:underline ml-1">Create Student Account</button>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                <button type="button" id="auth-guest-demo-btn" class="text-slate-500 hover:text-blue-700 font-semibold transition flex items-center gap-1.5 py-1">
+                    <i class="fas fa-graduation-cap text-slate-400"></i> Guest Demo Mode
+                </button>
+                <div>
+                    <span id="auth-toggle-prompt">First time here?</span>
+                    <button type="button" id="auth-toggle-btn" class="text-blue-600 font-bold hover:underline ml-1">Create Student Account</button>
+                </div>
             </div>
         </div>
 
@@ -1070,14 +1076,18 @@
                 setupWarningBanner.classList.remove('hidden');
             }
 
-            demoModeBtn.addEventListener('click', () => {
+            const activateDemoMode = () => {
                 unlockPortalForStudent({
                     displayName: "Demo Student",
                     email: "student@college.edu",
                     uid: "demo-student-123"
                 });
                 showToast("Unlocked in Demo Student Mode", "info");
-            });
+            };
+
+            if (demoModeBtn) demoModeBtn.addEventListener('click', activateDemoMode);
+            const guestDemoBtn = document.getElementById('auth-guest-demo-btn');
+            if (guestDemoBtn) guestDemoBtn.addEventListener('click', activateDemoMode);
 
             authToggleBtn.addEventListener('click', toggleAuthMode);
             authGoogleBtn.addEventListener('click', handleGoogleSignIn);
@@ -1098,6 +1108,19 @@
             dismissRestoreBtn.addEventListener('click', () => {
                 profileRestoreBanner.classList.add('hidden');
             });
+
+            // Handle redirect result if coming back from Google redirect
+            if (window.FirebaseService && window.FirebaseService.isConfigured()) {
+                window.FirebaseService.checkRedirectResult().then(user => {
+                    if (user) {
+                        unlockPortalForStudent(user);
+                        showToast(`Welcome ${user.displayName || 'Student'}!`, "success");
+                    }
+                }).catch(err => {
+                    console.error("Redirect sign-in error:", err);
+                    displayAuthError(err);
+                });
+            }
 
             // Firebase Auth State Listener
             if (window.FirebaseService) {
@@ -1166,21 +1189,103 @@
             }
         }
 
+        function displayAuthError(err) {
+            let message = err.message || "Authentication failed.";
+            if (err.code === 'auth/unauthorized-domain') {
+                const domain = window.location.hostname;
+                message = `
+                    <div class="space-y-1.5 text-left">
+                        <div class="font-bold text-red-900 flex items-center gap-1.5 text-xs">
+                            <i class="fas fa-shield-halved text-red-600"></i> Domain Authorization Required
+                        </div>
+                        <div class="text-[11px] leading-relaxed text-red-800">
+                            Firebase blocks sign-ins until <code class="bg-red-100 px-1 py-0.5 rounded font-mono font-bold text-red-900">${domain}</code> is added to Authorized Domains.
+                        </div>
+                        <div class="mt-2 text-[11px] bg-white/70 border border-red-200 p-2.5 rounded-xl text-red-950">
+                            <span class="font-bold block mb-1">To enable it (takes 30 seconds):</span>
+                            1. Open <a href="https://console.firebase.google.com/project/studentaicareer-f3e32/authentication/settings" target="_blank" class="underline font-bold text-blue-700 hover:text-blue-900">Firebase Auth Settings <i class="fas fa-external-link-alt text-[9px]"></i></a><br>
+                            2. Click <strong>Authorized domains</strong> tab &rarr; <strong>Add domain</strong><br>
+                            3. Type <code>${domain}</code> and save.
+                        </div>
+                    </div>
+                `;
+            } else if (err.code === 'auth/operation-not-allowed') {
+                message = `
+                    <div class="space-y-1.5 text-left">
+                        <div class="font-bold text-red-900 flex items-center gap-1.5 text-xs">
+                            <i class="fas fa-lock text-red-600"></i> Google Sign-In Disabled in Console
+                        </div>
+                        <div class="text-[11px] leading-relaxed text-red-800">
+                            Google authentication is not yet enabled in your Firebase project.
+                        </div>
+                        <div class="mt-2 text-[11px] bg-white/70 border border-red-200 p-2.5 rounded-xl text-red-950">
+                            1. Open <a href="https://console.firebase.google.com/project/studentaicareer-f3e32/authentication/providers" target="_blank" class="underline font-bold text-blue-700 hover:text-blue-900">Firebase Sign-in method <i class="fas fa-external-link-alt text-[9px]"></i></a><br>
+                            2. Click <strong>Google</strong> &rarr; Toggle <strong>Enable</strong> &rarr; Select support email &rarr; Save.
+                        </div>
+                    </div>
+                `;
+            } else if (err.code === 'auth/popup-blocked') {
+                message = `
+                    <div class="space-y-1 text-left">
+                        <div class="font-bold text-red-900 text-xs">Popup Blocked by Browser</div>
+                        <div class="text-[11px]">Your browser blocked the Google popup window.</div>
+                        <button type="button" id="auth-force-redirect-btn" class="mt-2 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 transition shadow-sm">
+                            <i class="fab fa-google"></i> Sign In via Full Redirect &rarr;
+                        </button>
+                    </div>
+                `;
+            } else if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+                message = "Invalid email or password. If you don't have an account, click 'Create Student Account' below.";
+            } else if (err.code === 'auth/email-already-in-use') {
+                message = "An account already exists with this email. Please click 'Sign In' instead.";
+            }
+
+            authErrorAlert.innerHTML = message;
+            authErrorAlert.classList.remove('hidden');
+
+            const forceRedirectBtn = document.getElementById('auth-force-redirect-btn');
+            if (forceRedirectBtn) {
+                forceRedirectBtn.addEventListener('click', async () => {
+                    if (window.FirebaseService) {
+                        await window.FirebaseService.signInWithGoogleRedirect();
+                    }
+                });
+            }
+        }
+
         async function handleGoogleSignIn() {
             if (!window.FirebaseService || !window.FirebaseService.isConfigured()) {
                 alert("Please configure your Firebase keys in firebase-config.js first.");
                 return;
             }
+
+            const googleBtnText = document.getElementById('auth-google-text');
+            const googleBtnSpinner = document.getElementById('auth-google-spinner');
+
             try {
                 authGoogleBtn.disabled = true;
+                if (googleBtnText) googleBtnText.classList.add('hidden');
+                if (googleBtnSpinner) {
+                    googleBtnSpinner.classList.remove('hidden');
+                    googleBtnSpinner.classList.add('inline-flex');
+                }
+                authErrorAlert.classList.add('hidden');
+
                 await window.FirebaseService.signInWithGoogle();
                 showToast("Signed in with Google!", "success");
             } catch (err) {
                 console.error("Google login failed:", err);
-                authErrorAlert.textContent = err.message || "Google sign in failed.";
-                authErrorAlert.classList.remove('hidden');
+                if (err.code === 'auth/popup-closed-by-user') {
+                    return;
+                }
+                displayAuthError(err);
             } finally {
                 authGoogleBtn.disabled = false;
+                if (googleBtnText) googleBtnText.classList.remove('hidden');
+                if (googleBtnSpinner) {
+                    googleBtnSpinner.classList.add('hidden');
+                    googleBtnSpinner.classList.remove('inline-flex');
+                }
             }
         }
 
@@ -1210,8 +1315,7 @@
                 }
             } catch (err) {
                 console.error("Auth error:", err);
-                authErrorAlert.textContent = err.message || "Authentication failed.";
-                authErrorAlert.classList.remove('hidden');
+                displayAuthError(err);
             } finally {
                 authSubmitText.classList.remove('hidden');
                 authSubmitSpinner.classList.add('hidden');
