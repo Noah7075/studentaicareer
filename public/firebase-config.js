@@ -12,13 +12,13 @@
  */
 
 const firebaseConfig = {
-    apiKey: "YOUR_FIREBASE_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
-};
+    apiKey: "AIzaSyAv6QilMTKazOqdUwwIoznDliigbfDU-O8",
+    authDomain: "studentaicareer-f3e32.firebaseapp.com",
+    projectId: "studentaicareer-f3e32",
+    storageBucket: "studentaicareer-f3e32.firebasestorage.app",
+    messagingSenderId: "543931394650",
+    appId: "1:543931394650:web:fab5788d5d364ba3794663"
+  };
 
 // --- Firebase Service Wrapper ---
 (function(window) {
@@ -43,7 +43,11 @@ const firebaseConfig = {
             }
             auth = firebase.auth();
             db = firebase.firestore();
-            storage = firebase.storage();
+            try {
+                storage = firebase.storage();
+            } catch (storageErr) {
+                console.info("Firebase Cloud Storage optional, continuing on Spark free tier.");
+            }
             isInitialized = true;
             console.log("Firebase initialized successfully.");
         } catch (err) {
