@@ -478,14 +478,14 @@
                         </div>
                     </div>
 
-                    <!-- 2. Contact & Online Profiles (4 Columns) -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 mb-5">
+                    <!-- 2. Contact Information (2 Columns) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                         <div>
-                            <label for="email" class="block text-xs font-semibold text-slate-700 mb-1">Email</label>
+                            <label for="email" class="block text-xs font-semibold text-slate-700 mb-1">College / Personal Email</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs"><i class="fas fa-envelope"></i></span>
                                 <input type="email" id="email"
-                                    class="w-full pl-8 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition placeholder:text-slate-400"
+                                    class="w-full pl-8 pr-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition placeholder:text-slate-400"
                                     placeholder="student@college.edu">
                             </div>
                         </div>
@@ -494,31 +494,13 @@
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs"><i class="fas fa-phone"></i></span>
                                 <input type="tel" id="phone"
-                                    class="w-full pl-8 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition placeholder:text-slate-400"
+                                    class="w-full pl-8 pr-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition placeholder:text-slate-400"
                                     placeholder="+91 98765 43210">
-                            </div>
-                        </div>
-                        <div>
-                            <label for="linkedin" class="block text-xs font-semibold text-slate-700 mb-1">LinkedIn Profile</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs"><i class="fab fa-linkedin text-blue-600"></i></span>
-                                <input type="text" id="linkedin"
-                                    class="w-full pl-8 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition placeholder:text-slate-400"
-                                    placeholder="linkedin.com/in/you">
-                            </div>
-                        </div>
-                        <div>
-                            <label for="github-profile" class="block text-xs font-semibold text-slate-700 mb-1">GitHub / Portfolio URL</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs"><i class="fab fa-github text-slate-800"></i></span>
-                                <input type="text" id="github-profile"
-                                    class="w-full pl-8 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition placeholder:text-slate-400"
-                                    placeholder="github.com/you">
                             </div>
                         </div>
                     </div>
 
-                    <!-- 3. Academic Stage & Placement CGPA Benchmark (Side-by-Side) -->
+                    <!-- 3. Academic Stage & Current GPA (Side-by-Side) -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
@@ -542,28 +524,20 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
-                                <i class="fas fa-chart-line text-emerald-600 text-xs"></i>
-                                <span>Current / Target CGPA (Campus Cutoff)</span>
+                            <label for="cgpa-input" class="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center justify-between">
+                                <span class="flex items-center gap-1.5">
+                                    <i class="fas fa-chart-line text-emerald-600 text-xs"></i>
+                                    <span>Current GPA</span>
+                                </span>
+                                <span class="text-[11px] text-slate-400 font-normal">Scale of 10.0</span>
                             </label>
-                            <div class="grid grid-cols-4 gap-1.5" id="cgpa-bracket-group">
-                                <div class="diagnostic-pill p-2 border border-slate-200 hover:border-slate-300 rounded-xl text-center" data-value="9.0+ CGPA">
-                                    <div class="text-xs font-bold text-slate-800">9.0+ CGPA</div>
-                                    <div class="text-[9px] text-emerald-600 font-semibold mt-0.5">Tier 1 Shortlist</div>
-                                </div>
-                                <div class="diagnostic-pill active p-2 border border-slate-200 hover:border-slate-300 rounded-xl text-center" data-value="8.0 - 8.9 CGPA">
-                                    <div class="text-xs font-bold text-slate-800">8.0–8.9</div>
-                                    <div class="text-[9px] text-blue-600 font-semibold mt-0.5">95%+ Drives</div>
-                                </div>
-                                <div class="diagnostic-pill p-2 border border-slate-200 hover:border-slate-300 rounded-xl text-center" data-value="7.0 - 7.9 CGPA">
-                                    <div class="text-xs font-bold text-slate-800">7.0–7.9</div>
-                                    <div class="text-[9px] text-slate-500 mt-0.5">Standard</div>
-                                </div>
-                                <div class="diagnostic-pill p-2 border border-slate-200 hover:border-slate-300 rounded-xl text-center" data-value="< 7.0 CGPA">
-                                    <div class="text-xs font-bold text-slate-800">&lt; 7.0 CGPA</div>
-                                    <div class="text-[9px] text-amber-600 font-semibold mt-0.5">Off-Campus</div>
-                                </div>
+                            <div class="relative">
+                                <input type="number" id="cgpa-input" step="0.01" min="0" max="10"
+                                    class="w-full pl-3.5 pr-14 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition placeholder:text-slate-400"
+                                    placeholder="e.g. 8.5" value="8.5">
+                                <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-xs font-semibold text-slate-400 pointer-events-none">/ 10</span>
                             </div>
+                            <p class="text-[11px] text-slate-400 mt-1">Used to evaluate campus placement criteria & tier cutoffs.</p>
                         </div>
                     </div>
 
@@ -640,6 +614,36 @@
                         </div>
                         <span class="text-xs font-semibold px-2.5 py-1 bg-blue-50 text-blue-700 rounded-full">Step 2 of
                             4</span>
+                    </div>
+
+                    <!-- Online Profiles & Links (For Resume Header) -->
+                    <div class="mb-6 mt-4 p-4 bg-slate-50/70 border border-slate-200 rounded-2xl">
+                        <div class="mb-3">
+                            <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                                <i class="fas fa-link text-indigo-600"></i> Online Profiles & Proof-of-Work Links
+                            </h3>
+                            <p class="text-[11px] text-slate-500">Featured in your ATS resume header for recruiter code reviews and profile verification</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="linkedin" class="block text-xs font-semibold text-slate-700 mb-1">LinkedIn Profile</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs"><i class="fab fa-linkedin text-blue-600"></i></span>
+                                    <input type="text" id="linkedin"
+                                        class="w-full pl-8 pr-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition placeholder:text-slate-400"
+                                        placeholder="linkedin.com/in/you">
+                                </div>
+                            </div>
+                            <div>
+                                <label for="github-profile" class="block text-xs font-semibold text-slate-700 mb-1">GitHub / Portfolio URL</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs"><i class="fab fa-github text-slate-800"></i></span>
+                                    <input type="text" id="github-profile"
+                                        class="w-full pl-8 pr-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition placeholder:text-slate-400"
+                                        placeholder="github.com/you">
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Experience / Internships Section -->
@@ -1593,10 +1597,12 @@
                     document.querySelectorAll('#academic-stage-group .diagnostic-pill').forEach(p => {
                         p.classList.toggle('active', p.dataset.value === studentDiagnostic.academicStage);
                     });
-                    // Restore CGPA pill
-                    document.querySelectorAll('#cgpa-bracket-group .diagnostic-pill').forEach(p => {
-                        p.classList.toggle('active', p.dataset.value === studentDiagnostic.cgpaRange);
-                    });
+                    // Restore CGPA input
+                    const cgpaInput = document.getElementById('cgpa-input');
+                    if (cgpaInput && studentDiagnostic.cgpaRange) {
+                        const match = studentDiagnostic.cgpaRange.match(/[\d.]+/);
+                        if (match) cgpaInput.value = match[0];
+                    }
                     // Restore Target tier pill
                     document.querySelectorAll('#target-tier-group .diagnostic-pill').forEach(p => {
                         const isSelected = p.dataset.tier === studentDiagnostic.targetTier;
@@ -1754,6 +1760,11 @@
                     showError("Please enter your name and at least one skill.", 1);
                     return;
                 }
+                const cgpaInput = document.getElementById('cgpa-input');
+                if (cgpaInput && cgpaInput.value.trim() !== '') {
+                    const num = parseFloat(cgpaInput.value);
+                    if (!isNaN(num)) studentDiagnostic.cgpaRange = `${num} CGPA`;
+                }
                 showError("", 1);
                 if (buildResumeCheckbox.checked) {
                     changeStep(2);
@@ -1865,15 +1876,22 @@
                     });
                 });
 
-                // CGPA bracket selector
-                const cgpaPills = document.querySelectorAll('#cgpa-bracket-group .diagnostic-pill');
-                cgpaPills.forEach(pill => {
-                    pill.addEventListener('click', () => {
-                        cgpaPills.forEach(p => p.classList.remove('active'));
-                        pill.classList.add('active');
-                        studentDiagnostic.cgpaRange = pill.dataset.value;
-                    });
-                });
+                // CGPA input listener
+                const cgpaInput = document.getElementById('cgpa-input');
+                if (cgpaInput) {
+                    const syncCgpa = () => {
+                        const raw = cgpaInput.value.trim();
+                        const val = parseFloat(raw);
+                        if (!isNaN(val)) {
+                            studentDiagnostic.cgpaRange = `${val} CGPA`;
+                        } else if (raw !== '') {
+                            studentDiagnostic.cgpaRange = `${raw} CGPA`;
+                        }
+                    };
+                    cgpaInput.addEventListener('input', syncCgpa);
+                    cgpaInput.addEventListener('change', syncCgpa);
+                    syncCgpa();
+                }
 
                 // Target Tier selector (single select)
                 const tierPills = document.querySelectorAll('#target-tier-group .diagnostic-pill');
@@ -2841,8 +2859,8 @@ Return ONLY a single valid JSON object with key "careers" containing the 2 caree
                                 </div>
                                 <div class="p-2 bg-slate-50 rounded-xl">
                                     <div class="text-[10px] text-slate-400 font-semibold uppercase">CGPA Cutoff</div>
-                                    <div class="text-xs font-bold ${studentDiagnostic.cgpaRange.includes('8.0') || studentDiagnostic.cgpaRange.includes('9.0') ? 'text-emerald-600' : (studentDiagnostic.cgpaRange.includes('7.0') ? 'text-blue-600' : 'text-amber-600')}">
-                                        ${studentDiagnostic.cgpaRange.includes('8.0') || studentDiagnostic.cgpaRange.includes('9.0') ? '✓ 95%+ Eligible' : 'Eligible'}
+                                    <div class="text-xs font-bold ${(parseFloat(studentDiagnostic.cgpaRange) || 8.0) >= 8.0 ? 'text-emerald-600' : ((parseFloat(studentDiagnostic.cgpaRange) || 8.0) >= 7.0 ? 'text-blue-600' : 'text-amber-600')}">
+                                        ${(parseFloat(studentDiagnostic.cgpaRange) || 8.0) >= 8.0 ? '✓ 95%+ Eligible' : ((parseFloat(studentDiagnostic.cgpaRange) || 8.0) >= 7.0 ? '✓ Standard Criteria' : 'Off-Campus Focus')}
                                     </div>
                                 </div>
                             </div>
@@ -3021,7 +3039,8 @@ Return ONLY a single valid JSON object with key "careers" containing the 2 caree
                 const hasDSA = studentDiagnostic.practicalProof.some(p => p.includes('150+') || p.includes('leetcode'));
                 const hasDeployed = studentDiagnostic.practicalProof.some(p => p.includes('Deployed') || p.includes('Full-Stack'));
                 const hasInternship = studentDiagnostic.practicalProof.some(p => p.includes('Internship'));
-                const isHighCGPA = studentDiagnostic.cgpaRange.includes('8.0') || studentDiagnostic.cgpaRange.includes('9.0');
+                const cgpaVal = parseFloat(studentDiagnostic.cgpaRange) || 8.0;
+                const isHighCGPA = cgpaVal >= 8.0;
 
                 if (studentDiagnostic.targetTier === 'product') {
                     if (hasDSA) proofBonus += 2.2;
