@@ -73,6 +73,62 @@
             border-left: 3px solid #6366f1;
         }
 
+        /* Diagnostic and selection pills */
+        .diagnostic-pill {
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            user-select: none;
+            background-color: #ffffff;
+        }
+        .diagnostic-pill:hover {
+            border-color: #93c5fd;
+            background-color: #f8fafc;
+        }
+        .diagnostic-pill.active {
+            border-color: #3b82f6 !important;
+            background-color: #eff6ff !important;
+            color: #1e40af !important;
+            box-shadow: 0 1px 4px rgba(59, 130, 246, 0.15);
+        }
+        .diagnostic-pill.active .indicator-radio-outer {
+            border-color: #3b82f6 !important;
+        }
+        .diagnostic-pill.active .indicator-radio-inner {
+            background-color: #3b82f6 !important;
+            transform: scale(1);
+        }
+        .indicator-radio-inner {
+            transform: scale(0);
+            transition: transform 0.15s ease-in-out;
+        }
+        .diagnostic-pill.active .indicator-check {
+            background-color: #3b82f6 !important;
+            border-color: #3b82f6 !important;
+            color: white !important;
+        }
+        .role-pill {
+            cursor: pointer;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+        .role-pill:hover {
+            border-color: #93c5fd;
+        }
+        .role-pill.active {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        .quick-skill-chip {
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .quick-skill-chip:hover {
+            background-color: #e2e8f0;
+            transform: translateY(-1px);
+        }
+
         /* AI Mentor Chat Widget */
         #chat-widget {
             position: fixed;
@@ -310,63 +366,151 @@
                     </div>
                 </div>
 
-                <!-- Step 1: Profile & Skills -->
+                <!-- Step 1: Profile & Academic Foundation -->
                 <div id="step-1">
                     <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-bold text-slate-900">Student Profile & Skills</h2>
-                        <span class="text-xs text-slate-500">Step 1 of 3</span>
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900">Student Profile & Academic Foundation</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Your college stage and credentials benchmark you against realistic campus placement cutoffs</p>
+                        </div>
+                        <span class="text-xs font-semibold px-2.5 py-1 bg-blue-50 text-blue-700 rounded-full">Step 1 of 4</span>
                     </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Basic Info -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label for="name" class="block text-sm font-semibold text-slate-700 mb-1">Full Name</label>
-                            <input type="text" id="name" class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="e.g., Alex Johnson">
+                            <label for="name" class="block text-xs font-semibold text-slate-700 mb-1">Full Name *</label>
+                            <input type="text" id="name" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="e.g. Rahul Sharma">
                         </div>
                         <div>
-                            <label for="email" class="block text-sm font-semibold text-slate-700 mb-1">Email</label>
-                            <input type="email" id="email" class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="e.g., student@college.edu">
+                            <label for="email" class="block text-xs font-semibold text-slate-700 mb-1">College / Personal Email *</label>
+                            <input type="email" id="email" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="e.g. rahul@college.edu">
                         </div>
                         <div>
-                            <label for="phone" class="block text-sm font-semibold text-slate-700 mb-1">Phone</label>
-                            <input type="tel" id="phone" class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="e.g., +91 98765 43210">
+                            <label for="phone" class="block text-xs font-semibold text-slate-700 mb-1">Phone Number</label>
+                            <input type="tel" id="phone" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="e.g. +91 98765 43210">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <!-- Online Profiles (LinkedIn + GitHub) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                         <div>
-                            <label for="linkedin" class="block text-sm font-semibold text-slate-700 mb-1">LinkedIn Profile</label>
-                            <input type="text" id="linkedin" class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="e.g., linkedin.com/in/alexjohnson">
+                            <label for="linkedin" class="block text-xs font-semibold text-slate-700 mb-1">LinkedIn Profile</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs"><i class="fab fa-linkedin text-blue-600"></i></span>
+                                <input type="text" id="linkedin" class="w-full pl-8 pr-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 transition" placeholder="linkedin.com/in/rahulsharma">
+                            </div>
                         </div>
                         <div>
-                            <label for="education" class="block text-sm font-semibold text-slate-700 mb-1">Degree / Education Level</label>
-                            <select id="education" class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white">
-                                <option>High School</option>
-                                <option>Diploma / Associate's</option>
-                                <option selected>Bachelor's Degree (B.Tech / B.E / B.Sc / BCA / B.Com)</option>
+                            <label for="github-profile" class="block text-xs font-semibold text-slate-700 mb-1">GitHub / Portfolio URL</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs"><i class="fab fa-github text-slate-800"></i></span>
+                                <input type="text" id="github-profile" class="w-full pl-8 pr-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 transition" placeholder="github.com/rahulsharma">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Academic Stage / Year of Study -->
+                    <div class="mt-5">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Academic Stage / Year of Study *</label>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5" id="academic-stage-group">
+                            <div class="diagnostic-pill border border-slate-300 rounded-xl p-3 flex items-center gap-3" data-value="1st / 2nd Year">
+                                <div class="w-4 h-4 rounded-full border-2 border-slate-300 flex items-center justify-center flex-shrink-0 indicator-radio-outer">
+                                    <div class="w-2 h-2 rounded-full indicator-radio-inner"></div>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-bold text-slate-800">1st / 2nd Year</div>
+                                    <div class="text-[10px] text-slate-500">Foundations, core DSA & exploration</div>
+                                </div>
+                            </div>
+                            <div class="diagnostic-pill active border border-slate-300 rounded-xl p-3 flex items-center gap-3" data-value="3rd Year">
+                                <div class="w-4 h-4 rounded-full border-2 border-slate-300 flex items-center justify-center flex-shrink-0 indicator-radio-outer">
+                                    <div class="w-2 h-2 rounded-full indicator-radio-inner"></div>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-bold text-slate-800">3rd Year (Pre-Final)</div>
+                                    <div class="text-[10px] text-slate-500">Internship hunting & core placement prep</div>
+                                </div>
+                            </div>
+                            <div class="diagnostic-pill border border-slate-300 rounded-xl p-3 flex items-center gap-3" data-value="Final Year / Recent Grad">
+                                <div class="w-4 h-4 rounded-full border-2 border-slate-300 flex items-center justify-center flex-shrink-0 indicator-radio-outer">
+                                    <div class="w-2 h-2 rounded-full indicator-radio-inner"></div>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-bold text-slate-800">Final Year / Recent Grad</div>
+                                    <div class="text-[10px] text-slate-500">Immediate placements & off-campus drives</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Degree & Branch -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
+                        <div>
+                            <label for="education" class="block text-xs font-semibold text-slate-700 mb-1">Degree Program</label>
+                            <select id="education" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 bg-white">
+                                <option selected>Bachelor's Degree (B.Tech / B.E / B.Sc / BCA)</option>
                                 <option>Master's Degree (M.Tech / M.Sc / MCA / MBA)</option>
-                                <option>Doctorate (Ph.D.)</option>
+                                <option>Diploma / Associate's</option>
                                 <option>Other / Self-Taught</option>
                             </select>
                         </div>
+                        <div>
+                            <label for="field-of-study" class="block text-xs font-semibold text-slate-700 mb-1">Field of Study / Branch</label>
+                            <input type="text" id="field-of-study" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 transition" placeholder="e.g. Computer Science, AI & ML, ECE, Data Science">
+                        </div>
                     </div>
 
-                    <div class="mt-6">
-                        <label for="field-of-study" class="block text-sm font-semibold text-slate-700 mb-1">Field of Study / Branch</label>
-                        <input type="text" id="field-of-study" class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="e.g., Computer Science, Electrical Engineering, Data Science">
+                    <!-- CGPA Eligibility Bracket -->
+                    <div class="mt-5">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Current / Target CGPA (Campus Cutoff Benchmark)</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="cgpa-bracket-group">
+                            <div class="diagnostic-pill border border-slate-300 rounded-xl p-2.5 text-center" data-value="9.0+ CGPA">
+                                <div class="text-xs font-bold text-slate-800">9.0+ CGPA</div>
+                                <div class="text-[10px] text-emerald-600 font-semibold">Tier 1 Shortlists</div>
+                            </div>
+                            <div class="diagnostic-pill active border border-slate-300 rounded-xl p-2.5 text-center" data-value="8.0 - 8.9 CGPA">
+                                <div class="text-xs font-bold text-slate-800">8.0 – 8.9 CGPA</div>
+                                <div class="text-[10px] text-blue-600 font-semibold">Eligible for 95%+ Drives</div>
+                            </div>
+                            <div class="diagnostic-pill border border-slate-300 rounded-xl p-2.5 text-center" data-value="7.0 - 7.9 CGPA">
+                                <div class="text-xs font-bold text-slate-800">7.0 – 7.9 CGPA</div>
+                                <div class="text-[10px] text-slate-500">Standard Criteria</div>
+                            </div>
+                            <div class="diagnostic-pill border border-slate-300 rounded-xl p-2.5 text-center" data-value="< 7.0 CGPA">
+                                <div class="text-xs font-bold text-slate-800">&lt; 7.0 CGPA</div>
+                                <div class="text-[10px] text-amber-600 font-semibold">Off-Campus Focus</div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="mt-6">
-                        <label for="skills-input" class="block text-sm font-semibold text-slate-700 mb-1">Skills (type and press Enter or comma)</label>
-                        <input type="text" id="skills-input" class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="e.g., Python, SQL, React, Communication, Problem Solving">
-                        <div id="skills-container" class="mt-3 flex flex-wrap min-h-[38px] p-2 bg-slate-50 border border-slate-200 rounded-xl"></div>
+                    <!-- Skills & Tags -->
+                    <div class="mt-5">
+                        <label for="skills-input" class="block text-xs font-semibold text-slate-700 mb-1">Technical & Practical Skills (Press Enter or comma to add)</label>
+                        <input type="text" id="skills-input" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 transition" placeholder="Type a skill and press Enter (e.g. Python, React, DSA, SQL, Java)...">
+                        
+                        <!-- Quick Add Skill Chips -->
+                        <div class="flex items-center gap-1.5 mt-2 flex-wrap text-xs text-slate-500">
+                            <span class="text-[11px] font-semibold text-slate-400">Quick add:</span>
+                            <button type="button" class="quick-skill-chip px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px]" data-skill="Python">+ Python</button>
+                            <button type="button" class="quick-skill-chip px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px]" data-skill="Java">+ Java</button>
+                            <button type="button" class="quick-skill-chip px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px]" data-skill="C++">+ C++</button>
+                            <button type="button" class="quick-skill-chip px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px]" data-skill="DSA">+ DSA</button>
+                            <button type="button" class="quick-skill-chip px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px]" data-skill="React">+ React</button>
+                            <button type="button" class="quick-skill-chip px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px]" data-skill="Node.js">+ Node.js</button>
+                            <button type="button" class="quick-skill-chip px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px]" data-skill="SQL">+ SQL</button>
+                            <button type="button" class="quick-skill-chip px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px]" data-skill="Git/GitHub">+ Git/GitHub</button>
+                        </div>
+
+                        <div id="skills-container" class="mt-2.5 flex flex-wrap min-h-[42px] p-2 bg-slate-50 border border-slate-200 rounded-xl"></div>
                     </div>
 
                     <!-- AI Summary Generator -->
                     <div class="mt-6 p-4 bg-slate-50 rounded-2xl border border-slate-200">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             <div>
-                                <h4 class="font-bold text-slate-800 text-sm">Need a Professional Resume Summary?</h4>
-                                <p class="text-xs text-slate-500">Let Gemini generate a tailored bio based on your academic profile & skills.</p>
+                                <h4 class="font-bold text-slate-800 text-sm">Need an ATS-Optimized Placement Summary?</h4>
+                                <p class="text-xs text-slate-500">Gemini will generate a strong 2-sentence bio emphasizing your branch, CGPA, and core skills.</p>
                             </div>
                             <button id="generate-summary-btn" class="bg-indigo-100 text-indigo-700 hover:bg-indigo-200 font-semibold px-4 py-2 rounded-xl text-xs transition flex items-center justify-center flex-shrink-0">
                                 <span id="summary-btn-text"><i class="fas fa-magic mr-1.5"></i>Generate Summary with AI</span>
@@ -378,87 +522,264 @@
                         </div>
                     </div>
 
-                    <div class="mt-6 flex items-center">
+                    <div class="mt-5 flex items-center">
                         <input id="build-resume-checkbox" type="checkbox" checked class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded">
-                        <label for="build-resume-checkbox" class="ml-2 block text-sm font-medium text-slate-700">Include Experience & Projects to export a tailored resume</label>
+                        <label for="build-resume-checkbox" class="ml-2 block text-xs font-medium text-slate-700">Include Experience & Projects to export an IIT/NIT ATS-format placement resume (PDF)</label>
                     </div>
 
-                    <div id="step-1-error" class="text-red-500 text-sm mt-2 text-right h-5"></div>
+                    <div id="step-1-error" class="text-red-500 text-xs mt-2 text-right h-4 font-semibold"></div>
 
-                    <div class="mt-8 flex justify-end">
-                        <button id="next-from-step-1-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-xl transition shadow-sm flex items-center gap-2">
-                            <span>Continue</span>
+                    <div class="mt-6 flex justify-end">
+                        <button id="next-from-step-1-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-xl transition shadow-sm flex items-center gap-2 text-sm">
+                            <span>Continue to Experience & Projects</span>
                             <i class="fas fa-arrow-right text-xs"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- Step 2: Experience & Projects -->
+                <!-- Step 2: Practical Experience & Proof-of-Work Projects -->
                 <div id="step-2" class="hidden">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-bold text-slate-900">Internships, Experience & Projects</h2>
-                        <span class="text-xs text-slate-500">Step 2 of 3</span>
+                    <div class="flex items-center justify-between mb-2">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900">Internships, Experience & Practical Projects</h2>
+                            <p class="text-xs text-slate-500">Recruiters prioritize practical proof of work (deployed apps, live URLs, and verified internships over tutorial clones).</p>
+                        </div>
+                        <span class="text-xs font-semibold px-2.5 py-1 bg-blue-50 text-blue-700 rounded-full">Step 2 of 4</span>
                     </div>
 
-                    <!-- Experience Section -->
-                    <div class="mb-8">
+                    <!-- Experience / Internships Section -->
+                    <div class="mb-7 mt-4">
                         <div class="flex justify-between items-center mb-3">
-                            <h3 class="text-lg font-semibold text-slate-800">Internships & Work Experience</h3>
-                            <button id="add-experience-btn" class="text-sm font-semibold text-blue-600 hover:text-blue-800 transition flex items-center">
-                                <i class="fas fa-plus mr-1"></i> Add Experience
+                            <div>
+                                <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                                    <i class="fas fa-briefcase text-blue-600"></i> Internships & Practical Experience
+                                </h3>
+                                <p class="text-[11px] text-slate-400">Summer internships, tech fellowships, or college technical club roles</p>
+                            </div>
+                            <button id="add-experience-btn" class="text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                                <i class="fas fa-plus"></i> Add Internship
                             </button>
                         </div>
                         <div id="experience-entries" class="space-y-4"></div>
                     </div>
 
-                    <!-- Projects Section -->
-                    <div class="mb-8">
+                    <!-- Academic & Personal Projects Section -->
+                    <div class="mb-7">
                         <div class="flex justify-between items-center mb-3">
-                            <h3 class="text-lg font-semibold text-slate-800">Academic & Personal Projects</h3>
-                            <button id="add-project-btn" class="text-sm font-semibold text-blue-600 hover:text-blue-800 transition flex items-center">
-                                <i class="fas fa-plus mr-1"></i> Add Project
+                            <div>
+                                <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                                    <i class="fas fa-code text-indigo-600"></i> Proof-of-Work Projects
+                                </h3>
+                                <p class="text-[11px] text-slate-400">Capstone projects, hackathon prototypes, or full-stack web/mobile apps</p>
+                            </div>
+                            <button id="add-project-btn" class="text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                                <i class="fas fa-plus"></i> Add Project
                             </button>
                         </div>
                         <div id="project-entries" class="space-y-4"></div>
                     </div>
 
                     <div class="mt-8 flex justify-between">
-                        <button id="prev-to-step-1-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-6 py-2.5 rounded-xl transition">
-                            <i class="fas fa-arrow-left text-xs mr-2"></i>Back
+                        <button id="prev-to-step-1-btn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-5 py-2.5 rounded-xl transition text-sm flex items-center gap-2">
+                            <i class="fas fa-arrow-left text-xs"></i> Back
                         </button>
-                        <button id="next-to-step-3-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-xl transition shadow-sm">
-                            Continue to Goals<i class="fas fa-arrow-right text-xs ml-2"></i>
+                        <button id="next-to-step-3-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-xl transition shadow-sm text-sm flex items-center gap-2">
+                            <span>Continue to Goals & Diagnostic</span>
+                            <i class="fas fa-arrow-right text-xs"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- Step 3: Interests & Aspirations -->
+                <!-- Step 3: Career Goals & Student Placement Diagnostic -->
                 <div id="step-3" class="hidden">
                     <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-bold text-slate-900">Career Goals & Preferences</h2>
-                        <span class="text-xs text-slate-500">Step 3 of 3</span>
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900">Career Goals & Placement Diagnostic</h2>
+                            <p class="text-xs text-slate-500">Benchmark your real student credentials against campus recruiter expectations (no generic fluff)</p>
+                        </div>
+                        <span class="text-xs font-semibold px-2.5 py-1 bg-blue-50 text-blue-700 rounded-full">Step 3 of 4</span>
                     </div>
 
-                    <div>
+                    <!-- 1. Target Company Tier -->
+                    <div class="mb-6">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                            <i class="fas fa-bullseye text-blue-600 mr-1.5"></i> Target Company Tier
+                        </label>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3" id="target-tier-group">
+                            <div class="diagnostic-pill active border border-slate-300 rounded-2xl p-4 flex flex-col justify-between" data-tier="product">
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="text-xs font-extrabold text-blue-900">Product / FAANG</span>
+                                        <span class="text-[11px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">₹15–30+ LPA</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 leading-relaxed mt-1">Amazon, Google, Microsoft, Atlassian, Flipkart. Focus: High DSA, System Design basics, Core CS.</p>
+                                </div>
+                                <div class="mt-3 flex items-center text-[11px] font-semibold text-blue-700">
+                                    <div class="w-3.5 h-3.5 rounded-full border-2 border-blue-600 flex items-center justify-center mr-2 indicator-radio-outer">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-blue-600 indicator-radio-inner"></div>
+                                    </div>
+                                    Selected Tier
+                                </div>
+                            </div>
+
+                            <div class="diagnostic-pill border border-slate-300 rounded-2xl p-4 flex flex-col justify-between" data-tier="startup">
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="text-xs font-extrabold text-slate-900">High-Growth Startups</span>
+                                        <span class="text-[11px] font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-full">₹8–16 LPA</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 leading-relaxed mt-1">Series A/B funded firms, fintech, SaaS. Focus: Fast shipping, deployed full-stack apps, APIs, modern frameworks.</p>
+                                </div>
+                                <div class="mt-3 flex items-center text-[11px] font-semibold text-slate-500">
+                                    <div class="w-3.5 h-3.5 rounded-full border-2 border-slate-300 flex items-center justify-center mr-2 indicator-radio-outer">
+                                        <div class="w-1.5 h-1.5 rounded-full indicator-radio-inner"></div>
+                                    </div>
+                                    Select Tier
+                                </div>
+                            </div>
+
+                            <div class="diagnostic-pill border border-slate-300 rounded-2xl p-4 flex flex-col justify-between" data-tier="mass">
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="text-xs font-extrabold text-slate-900">Mass Recruiters / IT</span>
+                                        <span class="text-[11px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">₹4–7 LPA</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 leading-relaxed mt-1">TCS Digital/Ninja, Infosys, Wipro, Cognizant. Focus: Aptitude, English, OOPs fundamentals, SQL basics.</p>
+                                </div>
+                                <div class="mt-3 flex items-center text-[11px] font-semibold text-slate-500">
+                                    <div class="w-3.5 h-3.5 rounded-full border-2 border-slate-300 flex items-center justify-center mr-2 indicator-radio-outer">
+                                        <div class="w-1.5 h-1.5 rounded-full indicator-radio-inner"></div>
+                                    </div>
+                                    Select Tier
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Practical Hands-on Level -->
+                    <div class="mb-6">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                            <i class="fas fa-hammer text-indigo-600 mr-1.5"></i> Practical Hands-on Proof (Select all that apply)
+                        </label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5" id="practical-proof-group">
+                            <div class="diagnostic-pill border border-slate-300 rounded-xl p-3 flex items-center gap-2.5" data-proof="internship">
+                                <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center flex-shrink-0 indicator-check">
+                                    <i class="fas fa-check text-[10px]"></i>
+                                </div>
+                                <span class="text-xs font-medium text-slate-800">Done 1+ Internship</span>
+                            </div>
+                            <div class="diagnostic-pill border border-slate-300 rounded-xl p-3 flex items-center gap-2.5" data-proof="deployed_app">
+                                <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center flex-shrink-0 indicator-check">
+                                    <i class="fas fa-check text-[10px]"></i>
+                                </div>
+                                <span class="text-xs font-medium text-slate-800">Built & Deployed Full-Stack App</span>
+                            </div>
+                            <div class="diagnostic-pill border border-slate-300 rounded-xl p-3 flex items-center gap-2.5" data-proof="leetcode_150">
+                                <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center flex-shrink-0 indicator-check">
+                                    <i class="fas fa-check text-[10px]"></i>
+                                </div>
+                                <span class="text-xs font-medium text-slate-800">Solved 150+ DSA/LeetCode</span>
+                            </div>
+                            <div class="diagnostic-pill border border-slate-300 rounded-xl p-3 flex items-center gap-2.5" data-proof="open_source">
+                                <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center flex-shrink-0 indicator-check">
+                                    <i class="fas fa-check text-[10px]"></i>
+                                </div>
+                                <span class="text-xs font-medium text-slate-800">Active GitHub / Open Source</span>
+                            </div>
+                            <div class="diagnostic-pill border border-slate-300 rounded-xl p-3 flex items-center gap-2.5" data-proof="college_tech_lead">
+                                <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center flex-shrink-0 indicator-check">
+                                    <i class="fas fa-check text-[10px]"></i>
+                                </div>
+                                <span class="text-xs font-medium text-slate-800">Coding Club / Tech Society Lead</span>
+                            </div>
+                            <div class="diagnostic-pill border border-slate-300 rounded-xl p-3 flex items-center gap-2.5" data-proof="competitive_coding">
+                                <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center flex-shrink-0 indicator-check">
+                                    <i class="fas fa-check text-[10px]"></i>
+                                </div>
+                                <span class="text-xs font-medium text-slate-800">CodeChef / Codeforces Rated</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Certifications & Badges -->
+                    <div class="mb-6">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                            <i class="fas fa-award text-amber-500 mr-1.5"></i> Certifications & Badges
+                        </label>
+                        <div class="flex flex-wrap gap-2.5" id="certifications-group">
+                            <div class="diagnostic-pill border border-slate-300 rounded-xl px-3.5 py-2 flex items-center gap-2" data-cert="AWS / Cloud Certified">
+                                <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center indicator-check">
+                                    <i class="fas fa-check text-[10px]"></i>
+                                </div>
+                                <span class="text-xs font-medium text-slate-800">AWS/Cloud Certified</span>
+                            </div>
+                            <div class="diagnostic-pill border border-slate-300 rounded-xl px-3.5 py-2 flex items-center gap-2" data-cert="Google Data / AI">
+                                <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center indicator-check">
+                                    <i class="fas fa-check text-[10px]"></i>
+                                </div>
+                                <span class="text-xs font-medium text-slate-800">Google Data/AI</span>
+                            </div>
+                            <div class="diagnostic-pill border border-slate-300 rounded-xl px-3.5 py-2 flex items-center gap-2" data-cert="NPTEL / Coursera">
+                                <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center indicator-check">
+                                    <i class="fas fa-check text-[10px]"></i>
+                                </div>
+                                <span class="text-xs font-medium text-slate-800">NPTEL / Coursera</span>
+                            </div>
+                            <div class="diagnostic-pill border border-slate-300 rounded-xl px-3.5 py-2 flex items-center gap-2" data-cert="Hackathon Winner">
+                                <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center indicator-check">
+                                    <i class="fas fa-check text-[10px]"></i>
+                                </div>
+                                <span class="text-xs font-medium text-slate-800">Hackathon Winner</span>
+                            </div>
+                            <div class="diagnostic-pill border border-slate-300 rounded-xl px-3.5 py-2 flex items-center gap-2" data-cert="Other" id="cert-other-pill">
+                                <div class="w-4 h-4 rounded border border-slate-300 flex items-center justify-center indicator-check">
+                                    <i class="fas fa-check text-[10px]"></i>
+                                </div>
+                                <span class="text-xs font-medium text-slate-800">Other</span>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Typebox for "Other" -->
+                        <div id="cert-other-container" class="hidden mt-3 fade-in">
+                            <input type="text" id="cert-other-input" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 transition" placeholder="Type other achievements or certifications (e.g. Smart India Hackathon finalist, HackerRank 5-star, Azure AZ-900, Oracle Java)...">
+                        </div>
+                    </div>
+
+                    <!-- 4. Preferred Career Domain -->
+                    <div class="mb-5">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                            <i class="fas fa-laptop-code text-cyan-600 mr-1.5"></i> Preferred Role / Domain (Optional)
+                        </label>
+                        <div class="flex flex-wrap gap-2" id="preferred-roles-group">
+                            <button type="button" class="role-pill active px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-medium text-slate-700 bg-white" data-role="Software Dev (SDE)">Software Dev (SDE)</button>
+                            <button type="button" class="role-pill px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-medium text-slate-700 bg-white" data-role="Full-Stack Developer">Full-Stack Developer</button>
+                            <button type="button" class="role-pill px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-medium text-slate-700 bg-white" data-role="AI / ML Engineer">AI / ML Engineer</button>
+                            <button type="button" class="role-pill px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-medium text-slate-700 bg-white" data-role="Cloud & DevOps">Cloud & DevOps</button>
+                            <button type="button" class="role-pill px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-medium text-slate-700 bg-white" data-role="Data Analyst / Scientist">Data Analyst / Scientist</button>
+                            <button type="button" class="role-pill px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-medium text-slate-700 bg-white" data-role="Cybersecurity">Cybersecurity</button>
+                        </div>
+                    </div>
+
+                    <!-- Aspirations & Notes -->
+                    <div class="mb-4">
                         <div class="flex justify-between items-center mb-1">
-                            <label for="interests" class="block text-sm font-semibold text-slate-700">What roles or domains inspire you? What problems do you want to solve?</label>
-                            <button id="improve-interest-btn" class="text-xs bg-indigo-100 text-indigo-700 font-semibold px-2.5 py-1 rounded-lg hover:bg-indigo-200 transition flex items-center">
-                                <span id="improve-btn-text"><i class="fas fa-wand-magic-sparkles mr-1"></i>Enhance with AI</span>
-                                <span id="improving-spinner" class="hidden"><i class="fas fa-spinner fa-spin mr-1"></i>Refining...</span>
+                            <label for="interests" class="block text-xs font-semibold text-slate-700">Specific Dream Companies or Placement Notes (Optional)</label>
+                            <button id="autofill-diagnostic-btn" type="button" class="text-xs bg-indigo-50 text-indigo-700 font-semibold px-2.5 py-1 rounded-lg hover:bg-indigo-100 transition flex items-center">
+                                <i class="fas fa-sparkles mr-1"></i>Auto-summarize from Diagnostic
                             </button>
                         </div>
-                        <textarea id="interests" rows="5" class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="e.g., I am passionate about software engineering, especially cloud architectures and AI applications. I want to build robust products that scale to millions of users..."></textarea>
+                        <textarea id="interests" rows="3" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 transition" placeholder="e.g. Aiming for Amazon/Flipkart SDE roles or high-growth tech startups. Interested in building distributed systems and high-scale backend services..."></textarea>
                     </div>
 
-                    <div id="step-3-error" class="text-red-500 text-sm mt-2 text-right h-5"></div>
+                    <div id="step-3-error" class="text-red-500 text-xs mt-2 text-right h-4 font-semibold"></div>
 
                     <div class="mt-8 flex justify-between">
-                        <button id="prev-from-step-3-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-6 py-2.5 rounded-xl transition">
-                            <i class="fas fa-arrow-left text-xs mr-2"></i>Back
+                        <button id="prev-from-step-3-btn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-5 py-2.5 rounded-xl transition text-sm flex items-center gap-2">
+                            <i class="fas fa-arrow-left text-xs"></i> Back
                         </button>
-                        <button id="get-advice-btn" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold px-8 py-3 rounded-xl transition shadow-md flex items-center">
+                        <button id="get-advice-btn" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold px-8 py-3 rounded-xl transition shadow-md flex items-center text-sm">
                             <span id="btn-text"><i class="fas fa-sparkles mr-2"></i>Generate AI Career Plan</span>
-                            <span id="loading-spinner" class="hidden"><i class="fas fa-spinner fa-spin mr-2"></i>Analyzing with Gemini...</span>
+                            <span id="loading-spinner" class="hidden"><i class="fas fa-spinner fa-spin mr-2"></i>Benchmarking with Gemini...</span>
                         </button>
                     </div>
                 </div>
@@ -669,6 +990,19 @@
             questions: [],
             currentQuestionIndex: 0,
             isInterviewActive: false
+        };
+
+        // Real Indian Campus Placement Diagnostic State
+        let studentDiagnostic = {
+            academicStage: '3rd Year',
+            cgpaRange: '8.0 - 8.9 CGPA',
+            githubUrl: '',
+            targetTier: 'product',
+            targetTierLabel: 'Product Companies / FAANG (₹15–30+ LPA)',
+            practicalProof: [],
+            certifications: [],
+            certificationsOther: '',
+            preferredRoles: ['Software Dev (SDE)']
         };
 
         const learningResources = {
@@ -901,15 +1235,20 @@
         // 💾 PROFILE & RESUME CLOUD SYNCHRONIZATION
         // ==========================================
         function collectUserProfileData() {
+            updateDiagnosticState();
+
             const experiences = [];
             for (let i = 1; i <= experienceCount; i++) {
                 const titleEl = document.getElementById(`exp-title-${i}`);
                 if (titleEl) {
+                    const badges = [];
+                    document.querySelectorAll(`#exp-entry-${i} .exp-tag.active`).forEach(b => badges.push(b.dataset.tag));
                     experiences.push({
                         title: titleEl.value,
                         company: document.getElementById(`exp-company-${i}`)?.value || '',
                         start: document.getElementById(`exp-start-${i}`)?.value || '',
                         end: document.getElementById(`exp-end-${i}`)?.value || '',
+                        badges: badges,
                         desc: document.getElementById(`exp-desc-${i}`)?.value || ''
                     });
                 }
@@ -919,10 +1258,15 @@
             for (let i = 1; i <= projectCount; i++) {
                 const nameEl = document.getElementById(`proj-name-${i}`);
                 if (nameEl) {
+                    const badges = [];
+                    document.querySelectorAll(`#proj-entry-${i} .proj-tag.active`).forEach(b => badges.push(b.dataset.tag));
                     projects.push({
                         name: nameEl.value,
-                        desc: document.getElementById(`proj-desc-${i}`)?.value || '',
-                        tech: document.getElementById(`proj-tech-${i}`)?.value || ''
+                        tech: document.getElementById(`proj-tech-${i}`)?.value || '',
+                        liveUrl: document.getElementById(`proj-live-${i}`)?.value || '',
+                        repoUrl: document.getElementById(`proj-repo-${i}`)?.value || '',
+                        badges: badges,
+                        desc: document.getElementById(`proj-desc-${i}`)?.value || ''
                     });
                 }
             }
@@ -932,12 +1276,16 @@
                 email: document.getElementById('email')?.value || '',
                 phone: document.getElementById('phone')?.value || '',
                 linkedin: document.getElementById('linkedin')?.value || '',
+                githubUrl: document.getElementById('github-profile')?.value || '',
                 education: document.getElementById('education')?.value || '',
                 fieldOfStudy: document.getElementById('field-of-study')?.value || '',
+                studentDiagnostic: { ...studentDiagnostic },
                 skills: [...userSkills],
                 buildResume: buildResumeCheckbox?.checked || false,
                 aiSummary: aiSummaryText?.textContent || '',
                 interests: interestsTextarea?.value || '',
+                experiences: experiences,
+                projects: projects,
                 careerRecommendations: careerRecommendations || []
             };
         }
@@ -948,8 +1296,55 @@
             if (data.email) document.getElementById('email').value = data.email;
             if (data.phone) document.getElementById('phone').value = data.phone;
             if (data.linkedin) document.getElementById('linkedin').value = data.linkedin;
+            if (data.githubUrl && document.getElementById('github-profile')) document.getElementById('github-profile').value = data.githubUrl;
             if (data.education) document.getElementById('education').value = data.education;
             if (data.fieldOfStudy) document.getElementById('field-of-study').value = data.fieldOfStudy;
+
+            if (data.studentDiagnostic) {
+                studentDiagnostic = { ...studentDiagnostic, ...data.studentDiagnostic };
+                // Restore Academic stage pill
+                document.querySelectorAll('#academic-stage-group .diagnostic-pill').forEach(p => {
+                    p.classList.toggle('active', p.dataset.value === studentDiagnostic.academicStage);
+                });
+                // Restore CGPA pill
+                document.querySelectorAll('#cgpa-bracket-group .diagnostic-pill').forEach(p => {
+                    p.classList.toggle('active', p.dataset.value === studentDiagnostic.cgpaRange);
+                });
+                // Restore Target tier pill
+                document.querySelectorAll('#target-tier-group .diagnostic-pill').forEach(p => {
+                    const isSelected = p.dataset.tier === studentDiagnostic.targetTier;
+                    p.classList.toggle('active', isSelected);
+                    const label = p.querySelector('.indicator-radio-outer')?.parentElement;
+                    if (label) {
+                        label.innerHTML = isSelected 
+                            ? `<div class="w-3.5 h-3.5 rounded-full border-2 border-blue-600 flex items-center justify-center mr-2 indicator-radio-outer"><div class="w-1.5 h-1.5 rounded-full bg-blue-600 indicator-radio-inner"></div></div> Selected Tier`
+                            : `<div class="w-3.5 h-3.5 rounded-full border-2 border-slate-300 flex items-center justify-center mr-2 indicator-radio-outer"><div class="w-1.5 h-1.5 rounded-full indicator-radio-inner"></div></div> Select Tier`;
+                    }
+                });
+                // Restore practical proofs
+                document.querySelectorAll('#practical-proof-group .diagnostic-pill').forEach(p => {
+                    const txt = p.querySelector('span')?.textContent.trim();
+                    p.classList.toggle('active', Array.isArray(studentDiagnostic.practicalProof) && (studentDiagnostic.practicalProof.includes(txt) || studentDiagnostic.practicalProof.includes(p.dataset.proof)));
+                });
+                // Restore certifications
+                document.querySelectorAll('#certifications-group .diagnostic-pill').forEach(p => {
+                    if (p.dataset.cert !== 'Other') {
+                        p.classList.toggle('active', Array.isArray(studentDiagnostic.certifications) && studentDiagnostic.certifications.includes(p.dataset.cert));
+                    }
+                });
+                if (studentDiagnostic.certificationsOther) {
+                    const otherPill = document.getElementById('cert-other-pill');
+                    const otherInput = document.getElementById('cert-other-input');
+                    const otherContainer = document.getElementById('cert-other-container');
+                    if (otherPill) otherPill.classList.add('active');
+                    if (otherContainer) otherContainer.classList.remove('hidden');
+                    if (otherInput) otherInput.value = studentDiagnostic.certificationsOther;
+                }
+                // Restore preferred roles
+                document.querySelectorAll('#preferred-roles-group .role-pill').forEach(p => {
+                    p.classList.toggle('active', Array.isArray(studentDiagnostic.preferredRoles) && studentDiagnostic.preferredRoles.includes(p.dataset.role));
+                });
+            }
 
             if (Array.isArray(data.skills)) {
                 userSkills = [...data.skills];
@@ -980,6 +1375,11 @@
                     if (document.getElementById(`exp-start-${idx}`)) document.getElementById(`exp-start-${idx}`).value = exp.start || '';
                     if (document.getElementById(`exp-end-${idx}`)) document.getElementById(`exp-end-${idx}`).value = exp.end || '';
                     if (document.getElementById(`exp-desc-${idx}`)) document.getElementById(`exp-desc-${idx}`).value = exp.desc || '';
+                    if (Array.isArray(exp.badges)) {
+                        document.querySelectorAll(`#exp-entry-${idx} .exp-tag`).forEach(tag => {
+                            if (exp.badges.includes(tag.dataset.tag)) tag.classList.add('active');
+                        });
+                    }
                 });
             }
 
@@ -990,8 +1390,15 @@
                     addProjectEntry();
                     const idx = projectCount;
                     if (document.getElementById(`proj-name-${idx}`)) document.getElementById(`proj-name-${idx}`).value = proj.name || '';
-                    if (document.getElementById(`proj-desc-${idx}`)) document.getElementById(`proj-desc-${idx}`).value = proj.desc || '';
                     if (document.getElementById(`proj-tech-${idx}`)) document.getElementById(`proj-tech-${idx}`).value = proj.tech || '';
+                    if (document.getElementById(`proj-live-${idx}`)) document.getElementById(`proj-live-${idx}`).value = proj.liveUrl || '';
+                    if (document.getElementById(`proj-repo-${idx}`)) document.getElementById(`proj-repo-${idx}`).value = proj.repoUrl || '';
+                    if (document.getElementById(`proj-desc-${idx}`)) document.getElementById(`proj-desc-${idx}`).value = proj.desc || '';
+                    if (Array.isArray(proj.badges)) {
+                        document.querySelectorAll(`#proj-entry-${idx} .proj-tag`).forEach(tag => {
+                            if (proj.badges.includes(tag.dataset.tag)) tag.classList.add('active');
+                        });
+                    }
                 });
             }
 
@@ -1160,22 +1567,215 @@
             renderSkills();
         };
 
+        function initDiagnosticPills() {
+            // Academic Stage selector
+            const stagePills = document.querySelectorAll('#academic-stage-group .diagnostic-pill');
+            stagePills.forEach(pill => {
+                pill.addEventListener('click', () => {
+                    stagePills.forEach(p => p.classList.remove('active'));
+                    pill.classList.add('active');
+                    studentDiagnostic.academicStage = pill.dataset.value;
+                });
+            });
+
+            // CGPA bracket selector
+            const cgpaPills = document.querySelectorAll('#cgpa-bracket-group .diagnostic-pill');
+            cgpaPills.forEach(pill => {
+                pill.addEventListener('click', () => {
+                    cgpaPills.forEach(p => p.classList.remove('active'));
+                    pill.classList.add('active');
+                    studentDiagnostic.cgpaRange = pill.dataset.value;
+                });
+            });
+
+            // Target Tier selector (single select)
+            const tierPills = document.querySelectorAll('#target-tier-group .diagnostic-pill');
+            tierPills.forEach(pill => {
+                pill.addEventListener('click', () => {
+                    tierPills.forEach(p => {
+                        p.classList.remove('active');
+                        const label = p.querySelector('.indicator-radio-outer')?.parentElement;
+                        if (label) {
+                            label.innerHTML = `
+                                <div class="w-3.5 h-3.5 rounded-full border-2 border-slate-300 flex items-center justify-center mr-2 indicator-radio-outer">
+                                    <div class="w-1.5 h-1.5 rounded-full indicator-radio-inner"></div>
+                                </div> Select Tier
+                            `;
+                        }
+                    });
+                    pill.classList.add('active');
+                    const label = pill.querySelector('.indicator-radio-outer')?.parentElement;
+                    if (label) {
+                        label.innerHTML = `
+                            <div class="w-3.5 h-3.5 rounded-full border-2 border-blue-600 flex items-center justify-center mr-2 indicator-radio-outer">
+                                <div class="w-1.5 h-1.5 rounded-full bg-blue-600 indicator-radio-inner"></div>
+                            </div> Selected Tier
+                        `;
+                    }
+                    studentDiagnostic.targetTier = pill.dataset.tier;
+                    if (pill.dataset.tier === 'product') studentDiagnostic.targetTierLabel = 'Product Companies / FAANG (₹15–30+ LPA)';
+                    else if (pill.dataset.tier === 'startup') studentDiagnostic.targetTierLabel = 'High-Growth Startups (₹8–16 LPA)';
+                    else studentDiagnostic.targetTierLabel = 'Mass Recruiters / IT (₹4–7 LPA)';
+                });
+            });
+
+            // Practical Proof selector (multi select)
+            const proofPills = document.querySelectorAll('#practical-proof-group .diagnostic-pill');
+            proofPills.forEach(pill => {
+                pill.addEventListener('click', () => {
+                    pill.classList.toggle('active');
+                    updateDiagnosticState();
+                });
+            });
+
+            // Certifications selector (multi select)
+            const certPills = document.querySelectorAll('#certifications-group .diagnostic-pill');
+            const certOtherContainer = document.getElementById('cert-other-container');
+            certPills.forEach(pill => {
+                pill.addEventListener('click', () => {
+                    pill.classList.toggle('active');
+                    if (pill.dataset.cert === 'Other') {
+                        if (pill.classList.contains('active')) {
+                            certOtherContainer.classList.remove('hidden');
+                        } else {
+                            certOtherContainer.classList.add('hidden');
+                        }
+                    }
+                    updateDiagnosticState();
+                });
+            });
+
+            // Preferred roles selector (multi select)
+            const rolePills = document.querySelectorAll('#preferred-roles-group .role-pill');
+            rolePills.forEach(pill => {
+                pill.addEventListener('click', () => {
+                    pill.classList.toggle('active');
+                    updateDiagnosticState();
+                });
+            });
+
+            // Quick skill chips
+            document.querySelectorAll('.quick-skill-chip').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const skill = btn.dataset.skill.toLowerCase();
+                    if (!userSkills.includes(skill)) {
+                        userSkills.push(skill);
+                        renderSkills();
+                    }
+                });
+            });
+
+            // Auto-fill diagnostic summary button
+            const autofillBtn = document.getElementById('autofill-diagnostic-btn');
+            if (autofillBtn) {
+                autofillBtn.addEventListener('click', () => {
+                    updateDiagnosticState();
+                    const proofText = studentDiagnostic.practicalProof.length > 0 
+                        ? `Hands-on proof: ${studentDiagnostic.practicalProof.join(', ')}.` 
+                        : 'Focused on core projects and DSA foundations.';
+                    const certsText = studentDiagnostic.certifications.length > 0 
+                        ? `Certifications: ${studentDiagnostic.certifications.join(', ')}.` 
+                        : '';
+                    const rolesText = studentDiagnostic.preferredRoles.join(' / ') || 'Software Engineering';
+
+                    interestsTextarea.value = `Targeting ${studentDiagnostic.targetTierLabel} for ${rolesText} roles. Academic stage: ${studentDiagnostic.academicStage} (${studentDiagnostic.cgpaRange}). ${proofText} ${certsText} Dedicated to engineering high-scale, production-ready software systems.`;
+                    showToast("Diagnostic summary updated!", "success");
+                });
+            }
+        }
+
+        function updateDiagnosticState() {
+            // Read active proofs
+            const activeProofs = [];
+            document.querySelectorAll('#practical-proof-group .diagnostic-pill.active').forEach(p => {
+                activeProofs.push(p.querySelector('span')?.textContent.trim() || p.dataset.proof);
+            });
+            studentDiagnostic.practicalProof = activeProofs;
+
+            // Read active certs
+            const activeCerts = [];
+            document.querySelectorAll('#certifications-group .diagnostic-pill.active').forEach(p => {
+                if (p.dataset.cert !== 'Other') {
+                    activeCerts.push(p.dataset.cert);
+                }
+            });
+            const certOtherInput = document.getElementById('cert-other-input');
+            if (document.getElementById('cert-other-pill')?.classList.contains('active') && certOtherInput?.value.trim()) {
+                activeCerts.push(certOtherInput.value.trim());
+                studentDiagnostic.certificationsOther = certOtherInput.value.trim();
+            }
+            studentDiagnostic.certifications = activeCerts;
+
+            // Read active roles
+            const activeRoles = [];
+            document.querySelectorAll('#preferred-roles-group .role-pill.active').forEach(p => {
+                activeRoles.push(p.dataset.role);
+            });
+            studentDiagnostic.preferredRoles = activeRoles;
+
+            // Read github
+            const ghInput = document.getElementById('github-profile');
+            if (ghInput) studentDiagnostic.githubUrl = ghInput.value.trim();
+        }
+
         function addExperienceEntry() {
             experienceCount++;
             const entry = document.createElement('div');
-            entry.className = 'dynamic-entry p-4 space-y-3 bg-slate-50 rounded-r-xl border border-slate-200';
+            entry.id = `exp-entry-${experienceCount}`;
+            entry.className = 'dynamic-entry p-4 space-y-3 bg-white rounded-2xl border border-slate-200 shadow-sm fade-in';
             entry.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <input type="text" placeholder="Role / Title (e.g. Frontend Intern)" class="w-full px-3 py-2 border rounded-xl text-sm" id="exp-title-${experienceCount}">
-                    <input type="text" placeholder="Company / Organization" class="w-full px-3 py-2 border rounded-xl text-sm" id="exp-company-${experienceCount}">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                    <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                        <i class="fas fa-briefcase text-blue-600"></i> Internship / Role #${experienceCount}
+                    </span>
+                    <button type="button" class="text-slate-400 hover:text-rose-600 text-xs transition" onclick="removeEntry('exp-entry-${experienceCount}')">
+                        <i class="fas fa-trash-alt mr-1"></i>Remove
+                    </button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <input type="text" placeholder="Start Date (e.g. May 2023)" class="w-full px-3 py-2 border rounded-xl text-sm" id="exp-start-${experienceCount}">
-                    <input type="text" placeholder="End Date (e.g. Present)" class="w-full px-3 py-2 border rounded-xl text-sm" id="exp-end-${experienceCount}">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Role / Position</label>
+                        <input type="text" placeholder="e.g. SDE Intern, Frontend Intern" class="w-full px-3 py-2 border rounded-xl text-xs" id="exp-title-${experienceCount}">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Company / Organization</label>
+                        <input type="text" placeholder="e.g. Innovaccer, College Tech Club" class="w-full px-3 py-2 border rounded-xl text-xs" id="exp-company-${experienceCount}">
+                    </div>
                 </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Start Date</label>
+                        <input type="text" placeholder="e.g. May 2024" class="w-full px-3 py-2 border rounded-xl text-xs" id="exp-start-${experienceCount}">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">End Date</label>
+                        <input type="text" placeholder="e.g. July 2024 (or Present)" class="w-full px-3 py-2 border rounded-xl text-xs" id="exp-end-${experienceCount}">
+                    </div>
+                </div>
+
+                <!-- Internship Quick Verification Badges -->
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Internship Type & Proof Badges</label>
+                    <div class="flex flex-wrap gap-1.5">
+                        <span class="exp-tag cursor-pointer px-2.5 py-1 rounded-lg border border-slate-200 text-[11px] text-slate-600 hover:border-blue-400 transition" data-tag="Tech Internship" onclick="this.classList.toggle('active')">
+                            <i class="fas fa-check text-[9px] mr-1"></i> Tech Internship
+                        </span>
+                        <span class="exp-tag cursor-pointer px-2.5 py-1 rounded-lg border border-slate-200 text-[11px] text-slate-600 hover:border-blue-400 transition" data-tag="PPO Offered" onclick="this.classList.toggle('active')">
+                            <i class="fas fa-star text-[9px] text-amber-500 mr-1"></i> PPO Offered
+                        </span>
+                        <span class="exp-tag cursor-pointer px-2.5 py-1 rounded-lg border border-slate-200 text-[11px] text-slate-600 hover:border-blue-400 transition" data-tag="Research / Lab" onclick="this.classList.toggle('active')">
+                            <i class="fas fa-flask text-[9px] mr-1"></i> Research / Lab
+                        </span>
+                        <span class="exp-tag cursor-pointer px-2.5 py-1 rounded-lg border border-slate-200 text-[11px] text-slate-600 hover:border-blue-400 transition" data-tag="College Tech Team" onclick="this.classList.toggle('active')">
+                            <i class="fas fa-users text-[9px] mr-1"></i> College Tech Team
+                        </span>
+                    </div>
+                </div>
+
                 <div class="relative">
-                    <textarea placeholder="Key contributions and achievements..." rows="3" class="w-full px-3 py-2 border rounded-xl text-sm" id="exp-desc-${experienceCount}"></textarea>
-                    <button class="improve-ai-btn absolute bottom-2 right-2 text-xs bg-indigo-100 text-indigo-700 font-semibold px-2 py-1 rounded-lg hover:bg-indigo-200 transition flex items-center" data-target-id="exp-desc-${experienceCount}" data-context="experience">
+                    <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Key Impact & Tech Contributions</label>
+                    <textarea placeholder="e.g. Developed REST APIs in Node.js, handled MongoDB migrations, reduced query latency by 35%..." rows="2" class="w-full px-3 py-2 border rounded-xl text-xs" id="exp-desc-${experienceCount}"></textarea>
+                    <button type="button" class="improve-ai-btn absolute bottom-2 right-2 text-[11px] bg-indigo-50 text-indigo-700 font-semibold px-2 py-0.5 rounded-lg hover:bg-indigo-100 transition flex items-center" data-target-id="exp-desc-${experienceCount}" data-context="experience">
                         <span class="btn-text"><i class="fas fa-wand-magic-sparkles mr-1"></i>Improve</span>
                         <span class="spinner hidden"><i class="fas fa-spinner fa-spin"></i></span>
                     </button>
@@ -1187,20 +1787,74 @@
         function addProjectEntry() {
             projectCount++;
             const entry = document.createElement('div');
-            entry.className = 'dynamic-entry p-4 space-y-3 bg-slate-50 rounded-r-xl border border-slate-200';
+            entry.id = `proj-entry-${projectCount}`;
+            entry.className = 'dynamic-entry p-4 space-y-3 bg-white rounded-2xl border border-slate-200 shadow-sm fade-in';
             entry.innerHTML = `
-                <input type="text" placeholder="Project Title" class="w-full px-3 py-2 border rounded-xl text-sm" id="proj-name-${projectCount}">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                    <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                        <i class="fas fa-code text-indigo-600"></i> Project #${projectCount}
+                    </span>
+                    <button type="button" class="text-slate-400 hover:text-rose-600 text-xs transition" onclick="removeEntry('proj-entry-${projectCount}')">
+                        <i class="fas fa-trash-alt mr-1"></i>Remove
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Project Title</label>
+                        <input type="text" placeholder="e.g. E-Commerce Microservices Engine" class="w-full px-3 py-2 border rounded-xl text-xs" id="proj-name-${projectCount}">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Tech Stack Used</label>
+                        <input type="text" placeholder="e.g. Next.js, Node.js, PostgreSQL, Docker" class="w-full px-3 py-2 border rounded-xl text-xs" id="proj-tech-${projectCount}">
+                    </div>
+                </div>
+
+                <!-- Proof-of-Work Badges -->
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Recruiter Proof Badges</label>
+                    <div class="flex flex-wrap gap-1.5">
+                        <span class="proj-tag cursor-pointer px-2.5 py-1 rounded-lg border border-slate-200 text-[11px] text-slate-600 hover:border-indigo-400 transition active" data-tag="Deployed Live Demo" onclick="this.classList.toggle('active')">
+                            <i class="fas fa-external-link-alt text-[9px] mr-1"></i> Deployed Live Demo
+                        </span>
+                        <span class="proj-tag cursor-pointer px-2.5 py-1 rounded-lg border border-slate-200 text-[11px] text-slate-600 hover:border-indigo-400 transition active" data-tag="GitHub Repo" onclick="this.classList.toggle('active')">
+                            <i class="fab fa-github text-[9px] mr-1"></i> GitHub Repo
+                        </span>
+                        <span class="proj-tag cursor-pointer px-2.5 py-1 rounded-lg border border-slate-200 text-[11px] text-slate-600 hover:border-indigo-400 transition" data-tag="Hackathon Winner" onclick="this.classList.toggle('active')">
+                            <i class="fas fa-trophy text-[9px] text-amber-500 mr-1"></i> Hackathon / Capstone
+                        </span>
+                        <span class="proj-tag cursor-pointer px-2.5 py-1 rounded-lg border border-slate-200 text-[11px] text-slate-600 hover:border-indigo-400 transition" data-tag="Auth & DB" onclick="this.classList.toggle('active')">
+                            <i class="fas fa-shield-alt text-[9px] mr-1"></i> Full-Stack (Auth & DB)
+                        </span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Live Demo URL (Optional)</label>
+                        <input type="text" placeholder="https://myproject.vercel.app" class="w-full px-3 py-2 border rounded-xl text-xs" id="proj-live-${projectCount}">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">GitHub Repository (Optional)</label>
+                        <input type="text" placeholder="github.com/rahul/ecommerce-engine" class="w-full px-3 py-2 border rounded-xl text-xs" id="proj-repo-${projectCount}">
+                    </div>
+                </div>
+
                 <div class="relative">
-                    <textarea placeholder="Project overview, problem solved, and your contribution..." rows="3" class="w-full px-3 py-2 border rounded-xl text-sm" id="proj-desc-${projectCount}"></textarea>
-                    <button class="improve-ai-btn absolute bottom-2 right-2 text-xs bg-indigo-100 text-indigo-700 font-semibold px-2 py-1 rounded-lg hover:bg-indigo-200 transition flex items-center" data-target-id="proj-desc-${projectCount}" data-context="project">
+                    <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Problem Solved & Key Features</label>
+                    <textarea placeholder="e.g. Built an end-to-end fullstack platform with JWT authentication, Redis cache, and Stripe checkout..." rows="2" class="w-full px-3 py-2 border rounded-xl text-xs" id="proj-desc-${projectCount}"></textarea>
+                    <button type="button" class="improve-ai-btn absolute bottom-2 right-2 text-[11px] bg-indigo-50 text-indigo-700 font-semibold px-2 py-0.5 rounded-lg hover:bg-indigo-100 transition flex items-center" data-target-id="proj-desc-${projectCount}" data-context="project">
                         <span class="btn-text"><i class="fas fa-wand-magic-sparkles mr-1"></i>Improve</span>
                         <span class="spinner hidden"><i class="fas fa-spinner fa-spin"></i></span>
                     </button>
                 </div>
-                <input type="text" placeholder="Technologies Used (e.g. React, Node.js, Firebase)" class="w-full px-3 py-2 border rounded-xl text-sm" id="proj-tech-${projectCount}">
             `;
             projectEntries.appendChild(entry);
         }
+
+        window.removeEntry = function(entryId) {
+            const el = document.getElementById(entryId);
+            if (el) el.remove();
+        };
 
         async function handleGenerateSummary() {
             const name = document.getElementById('name').value;
@@ -1382,9 +2036,8 @@
                 let responseText = result.response;
 
                 if (context === 'recommendations' || context === 'interview_questions') {
-                    responseText = responseText.replace(/[\n\r\t\u0000-\u001F\u007F-\u009F]/g, '');
-                    responseText = responseText.replace(/,\s*([}\]])/g, '$1');
-                    let match = responseText.match(/\{.*\}/s);
+                    let cleaned = responseText.replace(/```json/gi, '').replace(/```/g, '').trim();
+                    const match = cleaned.match(/\{[\s\S]*\}/);
                     if (match) {
                         responseText = match[0];
                     } else {
@@ -1412,9 +2065,19 @@
         }
 
         async function getAIRecommendations() {
+            updateDiagnosticState();
+
             if (interestsTextarea.value.trim() === '') {
-                showError("Please describe your interests and aspirations.", 3);
-                return;
+                // Auto-fill if student didn't type custom text
+                const proofText = studentDiagnostic.practicalProof.length > 0 
+                    ? `Hands-on proof: ${studentDiagnostic.practicalProof.join(', ')}.` 
+                    : 'Focused on core projects and DSA foundations.';
+                const certsText = studentDiagnostic.certifications.length > 0 
+                    ? `Certifications: ${studentDiagnostic.certifications.join(', ')}.` 
+                    : '';
+                const rolesText = studentDiagnostic.preferredRoles.join(' / ') || 'Software Engineering';
+
+                interestsTextarea.value = `Targeting ${studentDiagnostic.targetTierLabel} for ${rolesText} roles. Academic stage: ${studentDiagnostic.academicStage} (${studentDiagnostic.cgpaRange}). ${proofText} ${certsText} Dedicated to engineering high-scale, production-ready software systems.`;
             }
             showError("", 3);
 
@@ -1423,14 +2086,52 @@
             getAdviceBtn.disabled = true;
 
             try {
-                const userNameRec = document.getElementById('name').value;
+                const userNameRec = document.getElementById('name').value || 'Student';
                 const educationRec = document.getElementById('education').value;
                 const fieldOfStudyRec = document.getElementById('field-of-study').value;
                 const interestsRec = interestsTextarea.value;
-                const prompt = `Act as an expert career advisor. I am ${userNameRec}, my education is ${educationRec} in ${fieldOfStudyRec}. My skills are: ${userSkills.join(', ')}. My interests are: "${interestsRec}". Based *only* on this information, recommend the top 2 career paths for me. For each path, provide: "title" (string), "description" (string, 1-2 sentences), "avgSalary" (string, in Indian currency LPA e.g. "₹8 - ₹15 LPA"), "outlook" (string, e.g., "15% Growth (High)"), "requiredSkills" (array of 5-7 key skills as strings). Return this as a single, valid JSON object with a key "careers" which is an array of the 2 career path objects. Do not include any other text, markdown formatting, or preamble. Example: {"careers": [{"title": "Software Engineer", ...}, {"title": "Data Scientist", ...}]}`;
+                const ghUrl = document.getElementById('github-profile')?.value || 'Available';
+
+                const prompt = `Act as an expert Indian campus placement director and tech career strategist.
+Candidate Placement Profile:
+- Candidate Name: ${userNameRec}
+- Academic Stage: ${studentDiagnostic.academicStage}
+- Degree & Branch: ${educationRec} in ${fieldOfStudyRec || 'Computer Science'}
+- CGPA Bracket: ${studentDiagnostic.cgpaRange}
+- GitHub / Portfolio: ${ghUrl}
+- Core Skills: ${userSkills.join(', ')}
+- Target Company Tier: ${studentDiagnostic.targetTierLabel}
+- Practical Hands-on Proof: ${studentDiagnostic.practicalProof.length > 0 ? studentDiagnostic.practicalProof.join(', ') : 'Early project stage'}
+- Certifications / Badges: ${studentDiagnostic.certifications.length > 0 ? studentDiagnostic.certifications.join(', ') : 'None yet'}
+- Preferred Domain: ${studentDiagnostic.preferredRoles.join(', ') || 'Software Engineering'}
+- Student Notes / Aspiration: "${interestsRec}"
+
+Recommend the TOP 2 career pathways tailored specifically for Indian campus & off-campus hiring.
+For each career pathway provide:
+- "title": (string, e.g. "Software Development Engineer (SDE)")
+- "description": (string, 2 sentences explaining why this fits their profile and target company tier)
+- "avgSalary": (string, realistic Indian campus CTC range e.g. "₹14 - ₹24 LPA (Base ₹12L + Stocks)")
+- "outlook": (string, e.g. "High Campus Hiring Demand")
+- "requiredSkills": (array of 6-7 high-demand technical skills)
+- "placementStrategy": (string, 2 sentences tailored to their academic year and target tier)
+- "targetCompanies": (array of 4 top hiring companies in India for this tier, e.g. ["Amazon", "Flipkart", "Swiggy", "PhonePe"])
+- "interviewRounds": (array of 4 strings detailing the placement round structure, e.g. ["Round 1: Online Coding (DSA & Aptitude)", "Round 2: Data Structures & Problem Solving", "Round 3: System Design & Project Deep Dive", "Round 4: Techno-HR & Cultural Fit"])
+
+Return ONLY a single valid JSON object with key "careers" containing the 2 career path objects. No markdown formatting, no backticks, no preamble.`;
 
                 const responseText = await callGeminiAPI(prompt, 'recommendations');
-                const data = JSON.parse(responseText);
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseErr) {
+                    const cleanText = responseText.replace(/```json/gi, '').replace(/```/g, '').trim();
+                    const match = cleanText.match(/\{[\s\S]*\}/);
+                    if (match) {
+                        data = JSON.parse(match[0]);
+                    } else {
+                        throw parseErr;
+                    }
+                }
 
                 if (data.careers && data.careers.length > 0) {
                     careerRecommendations = data.careers;
@@ -1438,14 +2139,17 @@
                     const secondMatch = data.careers.length >= 2 
                         ? data.careers[1] 
                         : { 
-                            title: "Explore Adjacent Roles", 
-                            description: "Your foundational skills match high-demand tech roles. Continue exploring to broaden your options!", 
-                            avgSalary: "N/A", 
-                            outlook: "N/A", 
-                            requiredSkills: [] 
+                            title: "Full-Stack Development Engineer", 
+                            description: "Your foundational tech skills match high-growth startup engineering roles.", 
+                            avgSalary: "₹10 - ₹18 LPA", 
+                            outlook: "Very High Demand", 
+                            requiredSkills: ["JavaScript", "React", "Node.js", "SQL", "Git", "REST APIs"],
+                            placementStrategy: "Focus on deploying full-stack apps with CI/CD and authentication.",
+                            targetCompanies: ["Razorpay", "Postman", "CRED", "Zerodha"],
+                            interviewRounds: ["Round 1: Machine Coding", "Round 2: System Architecture", "Round 3: Core Problem Solving", "Round 4: Culture Fit"]
                         };
 
-                    displayResults(document.getElementById('name').value, topMatch, secondMatch);
+                    displayResults(userNameRec, topMatch, secondMatch);
                     changeStep(4);
                     showLiveJobs();
                     networkingAssistantContainer.classList.remove('hidden');
@@ -1457,7 +2161,7 @@
                 }
             } catch (error) {
                 console.error("AI recommendations error:", error);
-                showError('Could not get AI advice. ' + error.message, 3);
+                showError('Could not get AI advice: ' + error.message, 3);
             } finally {
                 btnText.classList.remove('hidden');
                 loadingSpinner.classList.add('hidden');
@@ -1471,83 +2175,213 @@
             const secondMatchSkillGap = secondMatch.requiredSkills.filter(skill => !userSkills.map(s => s.toLowerCase()).includes(skill.toLowerCase()));
             const secondMatchKnownSkills = secondMatch.requiredSkills.filter(skill => userSkills.map(s => s.toLowerCase()).includes(skill.toLowerCase()));
 
+            const defaultCompanies = studentDiagnostic.targetTier === 'product'
+                ? ['Amazon', 'Google', 'Microsoft', 'Flipkart']
+                : (studentDiagnostic.targetTier === 'startup' ? ['Razorpay', 'CRED', 'Swiggy', 'Postman'] : ['TCS Digital', 'Infosys Specialist', 'Cognizant GenC Next', 'Wipro Turbo']);
+
+            const targetCompanies = Array.isArray(topMatch.targetCompanies) && topMatch.targetCompanies.length > 0 
+                ? topMatch.targetCompanies 
+                : defaultCompanies;
+
+            const interviewRounds = Array.isArray(topMatch.interviewRounds) && topMatch.interviewRounds.length > 0
+                ? topMatch.interviewRounds
+                : [
+                    "Round 1: Online Coding (DSA & Aptitude)",
+                    "Round 2: Core Data Structures & Algorithms",
+                    "Round 3: Project Deep Dive & System Architecture",
+                    "Round 4: Techno-HR & Managerial Discussion"
+                ];
+
             resultsContent.innerHTML = `
-                <div class="mb-6">
-                    <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-2">Personalized Career Advice for ${userName}!</h2>
-                    <p class="text-slate-600">Based on your academic profile, skills, and goals, here are your best-fit career pathways.</p>
+                <!-- Personalized Placement Header -->
+                <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-200">
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">${studentDiagnostic.academicStage}</span>
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">${studentDiagnostic.cgpaRange}</span>
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">${studentDiagnostic.targetTierLabel.split('(')[0].trim()}</span>
+                        </div>
+                        <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900">Personalized Campus Placement Plan for ${userName}!</h2>
+                        <p class="text-xs text-slate-500 mt-1">Benchmarked against real campus cutoffs, CTC brackets, and interview rounds</p>
+                    </div>
                 </div>
 
-                <!-- Top Recommendation Card -->
-                <div class="border-2 border-blue-500 rounded-3xl p-6 mb-8 bg-blue-50/50 shadow-sm">
-                    <div class="flex items-center gap-2 mb-2">
+                <!-- Top Career Match Card -->
+                <div class="border-2 border-blue-500 rounded-3xl p-6 mb-8 bg-gradient-to-br from-blue-50/70 to-indigo-50/40 shadow-sm">
+                    <div class="flex items-center justify-between gap-2 mb-2">
                         <span class="bg-blue-600 text-white text-xs uppercase font-extrabold px-3 py-1 rounded-full">Top Recommendation</span>
+                        <span class="text-xs font-bold text-blue-800"><i class="fas fa-chart-line mr-1"></i>${topMatch.outlook}</span>
                     </div>
                     <h3 class="text-2xl font-bold text-blue-900">${topMatch.title}</h3>
-                    <p class="text-slate-700 mt-2 mb-4 leading-relaxed">${topMatch.description}</p>
-                    <div class="flex flex-wrap gap-4 text-sm">
-                        <div class="flex items-center"><i class="fas fa-wallet text-emerald-600 mr-2"></i>Avg. Starting Package: <span class="font-bold ml-1 text-slate-800">${topMatch.avgSalary}</span></div>
-                        <div class="flex items-center"><i class="fas fa-chart-line text-purple-600 mr-2"></i>Hiring Outlook: <span class="font-bold ml-1 text-slate-800">${topMatch.outlook}</span></div>
+                    <p class="text-slate-700 mt-2 mb-4 text-sm leading-relaxed">${topMatch.description}</p>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 p-3.5 bg-white/80 rounded-2xl border border-blue-100 text-xs">
+                        <div class="flex items-center"><i class="fas fa-wallet text-emerald-600 mr-2 text-base"></i><div><span class="text-slate-400 block text-[10px] font-semibold uppercase">Campus CTC Range</span><span class="font-bold text-slate-800">${topMatch.avgSalary}</span></div></div>
+                        <div class="flex items-center"><i class="fas fa-bullseye text-blue-600 mr-2 text-base"></i><div><span class="text-slate-400 block text-[10px] font-semibold uppercase">Target Tier</span><span class="font-bold text-slate-800">${studentDiagnostic.targetTierLabel.split('(')[0]}</span></div></div>
+                        <div class="flex items-center"><i class="fas fa-building text-purple-600 mr-2 text-base"></i><div><span class="text-slate-400 block text-[10px] font-semibold uppercase">Top Hiring Firms</span><span class="font-bold text-slate-800">${targetCompanies.slice(0, 3).join(', ')}</span></div></div>
                     </div>
+
+                    ${topMatch.placementStrategy ? `
+                        <div class="mt-4 p-3 bg-blue-100/50 rounded-xl border border-blue-200 text-xs text-blue-950">
+                            <strong><i class="fas fa-lightbulb text-amber-500 mr-1.5"></i>Campus Strategy:</strong> ${topMatch.placementStrategy}
+                        </div>
+                    ` : ''}
                 </div>
 
-                <!-- Career Fit Gauge Score -->
+                <!-- Role Readiness & Tier Alignment Score -->
                 <div class="mb-8 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
-                    <h3 class="text-xl font-bold text-slate-900 mb-4">Role Readiness Score</h3>
                     <div class="flex flex-col md:flex-row items-center gap-6">
-                        <div class="relative w-48 h-24">
+                        <div class="relative w-48 h-24 flex-shrink-0">
                             <canvas id="fitScoreChart"></canvas>
                             <div class="absolute inset-0 flex items-end justify-center pb-1">
                                 <span class="text-2xl font-extrabold text-slate-800" id="fit-score-value">--/10</span>
                             </div>
                         </div>
                         <div class="flex-1">
-                            <p class="text-slate-600 text-sm leading-relaxed" id="fit-score-description">
-                                <i class="fas fa-spinner fa-spin mr-2"></i>Calculating alignment with campus hiring benchmarks...
+                            <div class="flex items-center justify-between mb-1.5">
+                                <h3 class="text-lg font-bold text-slate-900">Placement Readiness Benchmark</h3>
+                                <span class="text-[11px] font-semibold text-slate-400">Target: ${studentDiagnostic.targetTierLabel.split('(')[0]}</span>
+                            </div>
+                            <p class="text-slate-600 text-xs leading-relaxed" id="fit-score-description">
+                                <i class="fas fa-spinner fa-spin mr-2"></i>Analyzing your credentials against tier expectations...
                             </p>
+
+                            <!-- 3-Pillar Breakdown -->
+                            <div class="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-slate-100 text-center">
+                                <div class="p-2 bg-slate-50 rounded-xl">
+                                    <div class="text-[10px] text-slate-400 font-semibold uppercase">DSA & Coding</div>
+                                    <div class="text-xs font-bold ${studentDiagnostic.practicalProof.some(p => p.includes('150+') || p.includes('leetcode')) ? 'text-emerald-600' : 'text-amber-600'}">
+                                        ${studentDiagnostic.practicalProof.some(p => p.includes('150+') || p.includes('leetcode')) ? '✓ 150+ Solved' : '⚠ Build to 150+'}
+                                    </div>
+                                </div>
+                                <div class="p-2 bg-slate-50 rounded-xl">
+                                    <div class="text-[10px] text-slate-400 font-semibold uppercase">Project Proof</div>
+                                    <div class="text-xs font-bold ${studentDiagnostic.practicalProof.some(p => p.includes('Deployed') || p.includes('Internship')) ? 'text-emerald-600' : 'text-amber-600'}">
+                                        ${studentDiagnostic.practicalProof.some(p => p.includes('Deployed') || p.includes('Internship')) ? '✓ Deployed Proof' : '⚠ Deploy 1 App'}
+                                    </div>
+                                </div>
+                                <div class="p-2 bg-slate-50 rounded-xl">
+                                    <div class="text-[10px] text-slate-400 font-semibold uppercase">CGPA Cutoff</div>
+                                    <div class="text-xs font-bold ${studentDiagnostic.cgpaRange.includes('8.0') || studentDiagnostic.cgpaRange.includes('9.0') ? 'text-emerald-600' : (studentDiagnostic.cgpaRange.includes('7.0') ? 'text-blue-600' : 'text-amber-600')}">
+                                        ${studentDiagnostic.cgpaRange.includes('8.0') || studentDiagnostic.cgpaRange.includes('9.0') ? '✓ 95%+ Eligible' : 'Eligible'}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Second Recommendation -->
+                <!-- Structured 6-Month Placement Roadmap -->
+                <div class="mb-8 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                <i class="fas fa-calendar-alt text-indigo-600"></i> Structured 6-Month Placement Roadmap
+                            </h3>
+                            <p class="text-xs text-slate-500">Phased milestone plan to ensure Day-1 campus placement readiness</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Phase 1 -->
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[11px] font-extrabold bg-blue-100 text-blue-700 px-2.5 py-0.5 rounded-full">Months 1–2</span>
+                                <span class="text-[10px] text-slate-400 font-bold uppercase">Phase 1</span>
+                            </div>
+                            <h4 class="text-xs font-bold text-slate-800 mb-1.5">Core CS & DSA Foundations</h4>
+                            <ul class="text-[11px] text-slate-600 space-y-1.5 list-disc ml-3.5">
+                                <li>Master 1 language: C++, Java, or Python.</li>
+                                <li>Arrays, Strings, HashMaps, Two Pointers (50+ easy/medium).</li>
+                                <li>CS Core: OS (Processes/Threads) & DBMS (SQL queries & Normalization).</li>
+                            </ul>
+                        </div>
+
+                        <!-- Phase 2 -->
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[11px] font-extrabold bg-indigo-100 text-indigo-700 px-2.5 py-0.5 rounded-full">Months 3–4</span>
+                                <span class="text-[10px] text-slate-400 font-bold uppercase">Phase 2</span>
+                            </div>
+                            <h4 class="text-xs font-bold text-slate-800 mb-1.5">Advanced DSA & Capstone Build</h4>
+                            <ul class="text-[11px] text-slate-600 space-y-1.5 list-disc ml-3.5">
+                                <li>Trees, Graphs, Recursion, DP (Reach 120-150 LeetCode count).</li>
+                                <li>Build 1 deployed full-stack system with Auth, DB, and CI/CD.</li>
+                                <li>Computer Networks (TCP/IP, HTTP/HTTPS, DNS) & System Basics.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Phase 3 -->
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[11px] font-extrabold bg-emerald-100 text-emerald-700 px-2.5 py-0.5 rounded-full">Months 5–6</span>
+                                <span class="text-[10px] text-slate-400 font-bold uppercase">Phase 3</span>
+                            </div>
+                            <h4 class="text-xs font-bold text-slate-800 mb-1.5">Placement Sprint & Mock Rounds</h4>
+                            <ul class="text-[11px] text-slate-600 space-y-1.5 list-disc ml-3.5">
+                                <li>Company Online Assessment (OA) speed drills & timed contests.</li>
+                                <li>Live Voice Mock technical & STAR behavioral rounds.</li>
+                                <li>ATS resume polish, LinkedIn alumni referral outreach.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expected Campus Interview Rounds -->
+                <div class="mb-8 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+                    <h3 class="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
+                        <i class="fas fa-sitemap text-purple-600"></i> Expected Campus Interview Rounds for this Tier
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                        ${interviewRounds.map((rnd, i) => `
+                            <div class="p-3 bg-purple-50/50 rounded-2xl border border-purple-100">
+                                <div class="text-[10px] font-bold text-purple-600 uppercase mb-1">Step ${i + 1}</div>
+                                <div class="text-xs font-bold text-slate-800 leading-snug">${rnd}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Alternative Path Recommendation -->
                 <div class="mb-8">
-                    <h3 class="text-xl font-bold mb-4 text-slate-800">Alternative Path: ${secondMatch.title}</h3>
+                    <h3 class="text-lg font-bold mb-3 text-slate-800">Alternative Career Route: ${secondMatch.title}</h3>
                     <div class="border border-slate-200 rounded-3xl p-6 bg-slate-50">
-                        <p class="text-slate-700 mb-4 leading-relaxed">${secondMatch.description}</p>
-                        <div class="flex flex-wrap gap-4 text-sm mb-4">
-                            <div class="flex items-center"><i class="fas fa-wallet text-emerald-600 mr-2"></i>Avg. Salary: <span class="font-bold ml-1 text-slate-800">${secondMatch.avgSalary}</span></div>
-                            <div class="flex items-center"><i class="fas fa-chart-line text-purple-600 mr-2"></i>Hiring Outlook: <span class="font-bold ml-1 text-slate-800">${secondMatch.outlook}</span></div>
+                        <p class="text-slate-700 mb-3 text-xs leading-relaxed">${secondMatch.description}</p>
+                        <div class="flex flex-wrap gap-4 text-xs mb-4">
+                            <div class="flex items-center"><i class="fas fa-wallet text-emerald-600 mr-2"></i>Campus CTC: <span class="font-bold ml-1 text-slate-800">${secondMatch.avgSalary}</span></div>
+                            <div class="flex items-center"><i class="fas fa-chart-line text-purple-600 mr-2"></i>Hiring Demand: <span class="font-bold ml-1 text-slate-800">${secondMatch.outlook}</span></div>
                         </div>
-                        <div class="border-t border-slate-200 pt-4">
-                            <h4 class="font-bold text-sm mb-2 text-slate-800">Your Matching Skills</h4>
-                            <div class="flex flex-wrap gap-2 mb-4">
-                                ${secondMatchKnownSkills.length > 0 ? secondMatchKnownSkills.map(s => `<span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-1 rounded-full">${s}</span>`).join('') : '<p class="text-slate-500 text-xs">No direct matching skills yet.</p>'}
+                        <div class="border-t border-slate-200 pt-3">
+                            <h4 class="font-bold text-xs mb-1.5 text-slate-800">Your Matching Skills:</h4>
+                            <div class="flex flex-wrap gap-1.5 mb-3">
+                                ${secondMatchKnownSkills.length > 0 ? secondMatchKnownSkills.map(s => `<span class="bg-emerald-100 text-emerald-800 text-[11px] font-semibold px-2.5 py-0.5 rounded-full">${s}</span>`).join('') : '<p class="text-slate-500 text-xs">No direct matching skills yet.</p>'}
                             </div>
-                            <h4 class="font-bold text-sm mb-2 text-slate-800">Skills to Bridge</h4>
-                            <div class="flex flex-wrap gap-2">
-                                ${secondMatchSkillGap.map(s => `<span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-full">${s}</span>`).join('')}
+                            <h4 class="font-bold text-xs mb-1.5 text-slate-800">Skills to Bridge:</h4>
+                            <div class="flex flex-wrap gap-1.5">
+                                ${secondMatchSkillGap.map(s => `<span class="bg-amber-100 text-amber-800 text-[11px] font-semibold px-2.5 py-0.5 rounded-full">${s}</span>`).join('')}
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Growth Chart -->
+                <!-- Projected Demand Chart -->
                 <div class="mb-8">
-                    <h3 class="text-xl font-bold mb-4 text-slate-800">Projected 15-Year Market Demand</h3>
-                    <div class="border border-slate-200 rounded-3xl p-4 bg-white" style="height: 250px;">
+                    <h3 class="text-lg font-bold mb-3 text-slate-800">Projected 15-Year Industry Demand</h3>
+                    <div class="border border-slate-200 rounded-3xl p-4 bg-white" style="height: 240px;">
                         <canvas id="growthChart"></canvas>
                     </div>
                 </div>
 
                 <!-- Skills & Learning Roadmap -->
                 <div class="mb-8">
-                    <h3 class="text-xl font-bold mb-4 text-slate-800">Skill Development Roadmap</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <h3 class="text-lg font-bold mb-3 text-slate-800">Target Skill Development</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div class="border border-slate-200 rounded-3xl p-5 bg-white">
-                            <h4 class="font-bold text-sm mb-3 text-slate-800"><i class="fas fa-check-circle text-emerald-500 mr-2"></i>Skills You Already Have</h4>
-                            <div class="flex flex-wrap gap-2">
-                                ${topMatchKnownSkills.length > 0 ? topMatchKnownSkills.map(s => `<span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-1 rounded-full">${s}</span>`).join('') : '<p class="text-slate-500 text-xs">No matching skills yet. Let\'s build them!</p>'}
+                            <h4 class="font-bold text-xs mb-3 text-slate-800"><i class="fas fa-check-circle text-emerald-500 mr-2"></i>Skills You Already Have</h4>
+                            <div class="flex flex-wrap gap-1.5">
+                                ${topMatchKnownSkills.length > 0 ? topMatchKnownSkills.map(s => `<span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-1 rounded-full">${s}</span>`).join('') : '<p class="text-slate-500 text-xs">No matching skills yet. Start with core languages!</p>'}
                             </div>
-                            <h4 class="font-bold text-sm mt-5 mb-3 text-slate-800"><i class="fas fa-lightbulb text-amber-500 mr-2"></i>Skills to Develop (Your Gap)</h4>
+                            <h4 class="font-bold text-xs mt-5 mb-2.5 text-slate-800"><i class="fas fa-lightbulb text-amber-500 mr-2"></i>Skills to Develop (Your Gap)</h4>
                             <div class="space-y-2">
                                 ${topMatchSkillGap.length > 0 ? topMatchSkillGap.map((s, index) => `
                                     <div class="p-3 bg-amber-50/60 rounded-2xl border border-amber-200">
@@ -1565,8 +2399,8 @@
                         </div>
 
                         <div class="border border-slate-200 rounded-3xl p-5 bg-white">
-                            <h4 class="font-bold text-sm mb-3 text-slate-800"><i class="fas fa-book-open text-blue-500 mr-2"></i>Recommended Free Learning Resources</h4>
-                            <ul class="space-y-2.5">
+                            <h4 class="font-bold text-xs mb-3 text-slate-800"><i class="fas fa-book-open text-blue-500 mr-2"></i>Recommended Free Learning Resources</h4>
+                            <ul class="space-y-2">
                                 ${topMatchSkillGap.slice(0, 5).map(skill => {
                                     const resource = learningResources[skill.toLowerCase()];
                                     return resource ? `<li><a href="${resource.url}" target="_blank" class="text-blue-600 hover:underline text-xs flex items-center gap-1.5"><i class="fas fa-external-link-alt text-[10px]"></i> ${resource.title} for ${skill}</a></li>` : '';
@@ -1611,12 +2445,37 @@
                 }
             });
 
-            let scoreFromSkills = (matchCount / Math.max(requiredSkills.length, 1)) * 10;
-            let educationRelevance = (document.getElementById('field-of-study')?.value.toLowerCase().includes(career.title.toLowerCase().substring(0, 5))) ? 1.5 : 0;
+            // Realistic scoring based on Target Tier & Proof of Work
+            let scoreFromSkills = (matchCount / Math.max(requiredSkills.length, 1)) * 5.0; // 0 to 5.0
 
-            let finalScore = Math.min(scoreFromSkills + educationRelevance, 10);
-            if (finalScore < 3) finalScore += 1;
-            finalScore = Math.min(finalScore, 9.6);
+            let proofBonus = 0;
+            const hasDSA = studentDiagnostic.practicalProof.some(p => p.includes('150+') || p.includes('leetcode'));
+            const hasDeployed = studentDiagnostic.practicalProof.some(p => p.includes('Deployed') || p.includes('Full-Stack'));
+            const hasInternship = studentDiagnostic.practicalProof.some(p => p.includes('Internship'));
+            const isHighCGPA = studentDiagnostic.cgpaRange.includes('8.0') || studentDiagnostic.cgpaRange.includes('9.0');
+
+            if (studentDiagnostic.targetTier === 'product') {
+                if (hasDSA) proofBonus += 2.2;
+                if (hasDeployed) proofBonus += 1.5;
+                if (hasInternship) proofBonus += 1.0;
+                if (isHighCGPA) proofBonus += 0.8;
+                // Realistic penalty if missing DSA for Product Tier
+                if (!hasDSA && !hasDeployed) {
+                    proofBonus = Math.min(proofBonus, 0.5);
+                }
+            } else if (studentDiagnostic.targetTier === 'startup') {
+                if (hasDeployed) proofBonus += 2.8;
+                if (hasInternship) proofBonus += 1.5;
+                if (hasDSA) proofBonus += 1.0;
+            } else {
+                // Mass recruiter
+                if (isHighCGPA) proofBonus += 2.5;
+                if (userSkills.some(s => ['java', 'python', 'c++', 'sql'].includes(s))) proofBonus += 2.5;
+            }
+
+            let finalScore = scoreFromSkills + proofBonus;
+            if (finalScore < 3.2) finalScore = 3.5;
+            finalScore = Math.min(finalScore, 9.7);
             finalScore = Number(finalScore.toFixed(1));
 
             scoreValueEl.textContent = `${finalScore}/10`;
@@ -1624,11 +2483,11 @@
             new Chart(ctxFit.getContext('2d'), {
                 type: 'doughnut',
                 data: {
-                    labels: ['Fit', 'Gap'],
+                    labels: ['Readiness', 'Gap'],
                     datasets: [{
                         data: [finalScore, 10 - finalScore],
                         backgroundColor: [
-                            finalScore >= 7 ? '#22c55e' : (finalScore >= 4 ? '#f59e0b' : '#ef4444'),
+                            finalScore >= 7.5 ? '#22c55e' : (finalScore >= 5.0 ? '#f59e0b' : '#ef4444'),
                             '#e2e8f0'
                         ],
                         borderWidth: 0,
@@ -1648,14 +2507,25 @@
             });
 
             try {
-                const prompt = `Analyze student profile fit for "${career.title}" requiring [${requiredSkills.join(', ')}]. Student skills: [${userSkills.join(', ')}]. Fit score: ${finalScore}/10. 2 brief sentences. First sentence: Acknowledge score and a key strength. Second sentence: Single most important action to reach 10/10.`;
+                const prompt = `You are a campus placement evaluator. The student is targeting "${studentDiagnostic.targetTierLabel}" as a "${career.title}".
+Student Profile:
+- Academic Year: ${studentDiagnostic.academicStage}
+- CGPA: ${studentDiagnostic.cgpaRange}
+- Practical Proof: ${studentDiagnostic.practicalProof.join(', ') || 'No verifiable internships or LeetCode yet'}
+- Skills: ${userSkills.join(', ')}
+- Calculated Score: ${finalScore}/10
+
+Give an honest, realistic 2-sentence diagnostic assessment.
+Sentence 1: Candidly state where their current profile stands for this specific tier (acknowledge what's good or what is a critical red flag for recruiters).
+Sentence 2: State the single highest-priority action they must take in the next 60 days to crack this company tier. Direct, zero sugarcoating, helpful.`;
+
                 const fitResponse = await callGeminiAPI(prompt, 'chat', {
                     chatHistory: [{ role: 'user', parts: [{ text: prompt }] }],
-                    careerContext: "Career Fit Analysis"
+                    careerContext: "Campus Readiness Analysis"
                 });
                 descriptionEl.textContent = fitResponse;
             } catch (error) {
-                descriptionEl.textContent = `Your profile shows strong potential for ${career.title}. Focus on closing identified skill gaps to boost your campus hiring readiness.`;
+                descriptionEl.textContent = `Your profile shows a ${finalScore}/10 alignment for ${studentDiagnostic.targetTierLabel}. Focus on solving 150+ DSA problems and deploying a live full-stack project to maximize campus interview conversion.`;
             }
         }
 
@@ -1902,6 +2772,7 @@
             const email = document.getElementById('email').value || "";
             const phone = document.getElementById('phone').value || "";
             const linkedin = document.getElementById('linkedin').value || "";
+            const github = document.getElementById('github-profile')?.value || "";
             const education = document.getElementById('education').value || "";
             const fieldOfStudy = document.getElementById('field-of-study').value || "";
             const summary = aiSummaryText.textContent || document.getElementById('interests').value || "";
@@ -1910,46 +2781,52 @@
             let yPos = margin;
 
             doc.setFont("helvetica", "bold");
-            doc.setFontSize(20);
+            doc.setFontSize(18);
             doc.text(name.toUpperCase(), margin, yPos);
-            yPos += 8;
+            yPos += 7;
 
             doc.setFont("helvetica", "normal");
-            doc.setFontSize(9.5);
-            doc.text(`${email} | ${phone} | ${linkedin}`, margin, yPos);
-            yPos += 8;
-            doc.setDrawColor(200, 200, 200);
-            doc.line(margin, yPos - 3, 190, yPos - 3);
+            doc.setFontSize(8.5);
+            let contactLine = `${email} | ${phone}`;
+            if (linkedin) contactLine += ` | ${linkedin}`;
+            if (github) contactLine += ` | ${github}`;
+            doc.text(contactLine, margin, yPos);
+            yPos += 7;
+            doc.setDrawColor(210, 215, 225);
+            doc.line(margin, yPos - 2, 190, yPos - 2);
 
+            // Placement Summary
             if (summary) {
-                yPos += 4;
+                yPos += 3;
                 doc.setFont("helvetica", "bold");
-                doc.setFontSize(11);
-                doc.text("PROFESSIONAL SUMMARY", margin, yPos);
+                doc.setFontSize(10.5);
+                doc.text("PROFESSIONAL PLACEMENT SUMMARY", margin, yPos);
                 yPos += 5;
                 doc.setFont("helvetica", "normal");
-                doc.setFontSize(9.5);
+                doc.setFontSize(9);
                 const summaryLines = doc.splitTextToSize(summary, 170);
                 doc.text(summaryLines, margin, yPos);
                 yPos += (summaryLines.length * 4) + 4;
             }
 
+            // Technical Skills
             if (userSkills.length > 0) {
                 doc.setFont("helvetica", "bold");
-                doc.setFontSize(11);
-                doc.text("TECHNICAL & CORE SKILLS", margin, yPos);
+                doc.setFontSize(10.5);
+                doc.text("CORE TECHNICAL COMPETENCIES", margin, yPos);
                 yPos += 5;
                 doc.setFont("helvetica", "normal");
-                doc.setFontSize(9.5);
+                doc.setFontSize(9);
                 const skillsLines = doc.splitTextToSize(userSkills.join(', '), 170);
                 doc.text(skillsLines, margin, yPos);
                 yPos += (skillsLines.length * 4) + 4;
             }
 
+            // Experience / Internships
             if (experienceCount > 0) {
                 doc.setFont("helvetica", "bold");
-                doc.setFontSize(11);
-                doc.text("WORK & INTERNSHIP EXPERIENCE", margin, yPos);
+                doc.setFontSize(10.5);
+                doc.text("INTERNSHIPS & PRACTICAL EXPERIENCE", margin, yPos);
                 yPos += 5;
                 for (let i = 1; i <= experienceCount; i++) {
                     const title = document.getElementById(`exp-title-${i}`)?.value || '';
@@ -1965,54 +2842,69 @@
                     doc.text(`${title.toUpperCase()} | ${company}`, margin, yPos);
 
                     doc.setFont("helvetica", "italic");
+                    doc.setFontSize(8.5);
                     doc.text(`${start} - ${end}`, 190, yPos, { align: 'right' });
                     yPos += 4.5;
 
                     doc.setFont("helvetica", "normal");
+                    doc.setFontSize(9);
                     const descLines = doc.splitTextToSize(desc.replace(/•/g, '-'), 165);
                     doc.text(descLines, margin + 4, yPos);
                     yPos += (descLines.length * 4) + 3;
                 }
             }
 
+            // Featured Projects
             if (projectCount > 0) {
                 doc.setFont("helvetica", "bold");
-                doc.setFontSize(11);
-                doc.text("FEATURED PROJECTS", margin, yPos);
+                doc.setFontSize(10.5);
+                doc.text("FEATURED PRACTICAL PROJECTS", margin, yPos);
                 yPos += 5;
                 for (let i = 1; i <= projectCount; i++) {
                     const pName = document.getElementById(`proj-name-${i}`)?.value || '';
                     const desc = document.getElementById(`proj-desc-${i}`)?.value || '';
                     const tech = document.getElementById(`proj-tech-${i}`)?.value || '';
+                    const live = document.getElementById(`proj-live-${i}`)?.value || '';
+                    const repo = document.getElementById(`proj-repo-${i}`)?.value || '';
 
                     if (!pName) continue;
 
                     doc.setFont("helvetica", "bold");
                     doc.setFontSize(9.5);
-                    doc.text(pName.toUpperCase(), margin, yPos);
+                    let projectHeader = pName.toUpperCase();
+                    if (tech) projectHeader += ` (${tech})`;
+                    doc.text(projectHeader, margin, yPos);
                     yPos += 4.5;
 
+                    if (live || repo) {
+                        doc.setFont("helvetica", "italic");
+                        doc.setFontSize(8);
+                        let links = [];
+                        if (live) links.push(`Live Demo: ${live}`);
+                        if (repo) links.push(`GitHub: ${repo}`);
+                        doc.text(links.join(' | '), margin + 4, yPos);
+                        yPos += 4;
+                    }
+
                     doc.setFont("helvetica", "normal");
+                    doc.setFontSize(9);
                     const descLines = doc.splitTextToSize(desc.replace(/•/g, '-'), 165);
                     doc.text(descLines, margin + 4, yPos);
-                    yPos += (descLines.length * 4) + 2;
-
-                    doc.setFont("helvetica", "italic");
-                    doc.text(`Technologies: ${tech}`, margin + 4, yPos);
-                    yPos += 5;
+                    yPos += (descLines.length * 4) + 3;
                 }
             }
 
+            // Education with CGPA & Stage
             doc.setFont("helvetica", "bold");
-            doc.setFontSize(11);
-            doc.text("EDUCATION", margin, yPos);
+            doc.setFontSize(10.5);
+            doc.text("ACADEMIC PROFILE & EDUCATION", margin, yPos);
             yPos += 5;
             doc.setFont("helvetica", "bold");
             doc.setFontSize(9.5);
-            doc.text(education, margin, yPos);
-            yPos += 4.5;
-            doc.setFont("helvetica", "normal");
-            doc.text(fieldOfStudy, margin, yPos);
+            doc.text(`${education} - ${fieldOfStudy}`, margin, yPos);
+            doc.setFont("helvetica", "italic");
+            doc.setFontSize(8.5);
+            doc.text(`CGPA: ${studentDiagnostic.cgpaRange} | Stage: ${studentDiagnostic.academicStage}`, 190, yPos, { align: 'right' });
 
             return doc;
         }
@@ -2389,6 +3281,7 @@
             changeStep(1);
             addExperienceEntry();
             addProjectEntry();
+            initDiagnosticPills();
             initializeSpeechRecognition();
             initAuth();
         }
